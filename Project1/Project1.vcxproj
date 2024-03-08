@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Libraries\glew-2.0.0-win32\glew-2.0.0\include;C:\Libraries\freeglut-MSVC-3.0.0-2.mp\freeglut\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Libraries\glew-2.0.0-win32\glew-2.0.0\include;C:\Libraries\freeglut-MSVC-3.0.0-2.mp\freeglut\include;C:\Libraries\glm-0.9.6.3\glm;$(IncludePath)</IncludePath>
     <LibraryPath>c:\Libraries\glew-2.0.0-win32\glew-2.0.0\lib\Release\Win32;c:\Libraries\freeglut-MSVC-3.0.0-2.mp\freeglut\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,6 +139,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glsl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fragmentshader.frag" />
+    <Content Include="vertexshader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
