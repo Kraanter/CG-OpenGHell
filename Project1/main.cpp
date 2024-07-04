@@ -174,10 +174,20 @@ void InitMatrices() {
 // void InitObjects()
 //------------------------------------------------------------
 
+
+Material* createMaterial() {
+    const auto material = new Material();
+    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
+    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
+    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
+    material->power = 50.0;
+    return material;
+}
+
 void InitObjects() {
-    scene.addObject("Objects/teapot.obj", "textures/Yellobrk.bmp", new Material());
-    scene.addObject("Objects/torus.obj", "textures/uvtemplate.bmp", new Material());
-    scene.addObject("Objects/box.obj", "textures/Shrek.bmp", new Material());
+    scene.addObject("Objects/teapot.obj", "textures/Yellobrk.bmp", createMaterial());
+    scene.addObject("Objects/torus.obj", "textures/uvtemplate.bmp", createMaterial());
+    scene.addObject("Objects/box.obj", "textures/Shrek.bmp", createMaterial());
 
     scene.objects[2].modelSpace.translate(glm::vec3(0.0, 0.0, 0.0));
     scene.objects[1].modelSpace.translate(glm::vec3(-2.0, 0.0, 0.0));
@@ -189,16 +199,7 @@ void InitObjects() {
 // void InitMaterialsLight()
 //------------------------------------------------------------
 
-void InitMaterialsLight() {
-    light.position = glm::vec3(4.0, 4.0, 4.0);
-    for (int i = 0; i < scene.num_objects; i++) {
-        scene.objects[i].material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
-        scene.objects[i].material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
-        scene.objects[i].material->specular_color = glm::vec3(0.5, 0.5, 0.5);
-        scene.objects[i].material->power = 50.0;
-    }
-    // material.diffuse_color = glm::vec3(0.5, 0.0, 0.0);
-}
+void InitMaterialsLight() { light.position = glm::vec3(4.0, 4.0, 4.0); }
 
 
 //------------------------------------------------------------
