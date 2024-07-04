@@ -44,7 +44,7 @@ struct LightSource {
 
 // ID's
 GLuint program_id;
-GLuint* vao = new GLuint[NUM_OBJECTS];
+// GLuint* vao = new GLuint[NUM_OBJECTS];
 // GLuint* texture_id = new GLuint[NUM_OBJECTS];
 
 // Uniform ID's
@@ -109,7 +109,7 @@ void Render() {
         glUniform1f(uniform_material_power, material[i].power);
         glUniformMatrix4fv(uniform_mv, 1, GL_FALSE, value_ptr(mv[i]));
 
-        glBindVertexArray(vao[i]);
+        glBindVertexArray(objects[i].vao);
         glDrawArrays(GL_TRIANGLES, 0, objects[i].vertices.size());
         glBindVertexArray(0);
     }
@@ -226,70 +226,7 @@ void InitMaterialsLight() {
 //------------------------------------------------------------
 
 void InitBuffers() {
-    GLuint position_id;
-    GLuint normal_id;
-    GLuint vbo_vertices;
-    GLuint vbo_normals;
-    GLuint vbo_uvs;
-
-
-    GLuint uv_id = glGetAttribLocation(program_id, "uv");
-
-    // Get vertex attributes
-    position_id = glGetAttribLocation(program_id, "position");
-    normal_id = glGetAttribLocation(program_id, "normal");
-
-
-    // Stop bind to vao
-    glBindVertexArray(0);
-
-    for (int i = 0; i < NUM_OBJECTS; i++) {
-        // Allocate memory for vbo
-        glGenBuffers(1, &vbo_vertices);
-        glGenBuffers(1, &vbo_normals);
-        glGenBuffers(1, &vbo_uvs);
-
-        // Bind to vbo
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glBufferData(GL_ARRAY_BUFFER, objects[i].vertices.size() * sizeof(glm::vec3), &objects[i].vertices[0],
-                     GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        // Bind to vbo
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-        glBufferData(GL_ARRAY_BUFFER, objects[i].normals.size() * sizeof(glm::vec3), &objects[i].normals[0],
-                     GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        // Bind to vbo
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
-        glBufferData(GL_ARRAY_BUFFER, objects[i].uvs.size() * sizeof(glm::vec2), &objects[i].uvs[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        // Allocate memory for vao
-        glGenVertexArrays(1, &vao[i]);
-
-        // Bind to vao
-        glBindVertexArray(vao[i]);
-
-        // Bind vertices to vao
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-        glEnableVertexAttribArray(position_id);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        // Bind normals to vao
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-        glEnableVertexAttribArray(normal_id);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        // Bind uvs to vao
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
-        glVertexAttribPointer(uv_id, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-        glEnableVertexAttribArray(uv_id);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+    for (int i = 0; i < NUM_OBJECTS; i++) { objects[i].bindVBO(program_id); }
 
     // Make uniform vars
     uniform_mv = glGetUniformLocation(program_id, "mv");
