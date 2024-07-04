@@ -11,7 +11,7 @@ struct Material {
     float power;
 };
 
-class renderableObject {
+class objectData {
 public:
     std::vector<glm::mat4> modelSpace;
     std::vector<glm::vec3> vertices;
@@ -22,7 +22,7 @@ public:
 
     Material* material;
 
-    renderableObject();
-    explicit renderableObject(const char* obj_path, const char* txt_path);
+    objectData();
+    explicit objectData(const char* obj_path, const char* txt_path);
     void bindVBO(GLuint program_id);
 };

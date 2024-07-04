@@ -10,7 +10,7 @@
 
 #include "glsl.h"
 #include "objloader.h"
-#include "renderableObject.h"
+#include "objectData.h"
 #include "texture.h"
 
 using namespace std;
@@ -70,7 +70,7 @@ Material* material = new Material[NUM_OBJECTS];
 // Mesh variables
 //--------------------------------------------------------------------------------
 
-renderableObject* objects = new renderableObject[NUM_OBJECTS];
+objectData* objects = new objectData[NUM_OBJECTS];
 
 // vector<glm::vec3>* vertices = new vector<glm::vec3>[NUM_OBJECTS];
 // vector<glm::vec3>* normals = new vector<glm::vec3>[NUM_OBJECTS];
@@ -198,9 +198,9 @@ void InitObjects() {
     // Objects
     int i = 0;
 
-    objects[i++] = renderableObject("Objects/teapot.obj", "textures/Yellobrk.bmp");
-    objects[i++] = renderableObject("Objects/torus.obj", "textures/uvtemplate.bmp");
-    objects[i++] = renderableObject("Objects/box.obj", "textures/Shrek.bmp");
+    objects[i++] = objectData("Objects/teapot.obj", "textures/Yellobrk.bmp");
+    objects[i++] = objectData("Objects/torus.obj", "textures/uvtemplate.bmp");
+    objects[i++] = objectData("Objects/box.obj", "textures/Shrek.bmp");
 }
 
 

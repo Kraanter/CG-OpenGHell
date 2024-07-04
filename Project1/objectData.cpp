@@ -1,13 +1,13 @@
-﻿#include "renderableObject.h"
+﻿#include "objectData.h"
 
 #include <iostream>
 
 #include "objloader.h"
 #include "texture.h"
 
-renderableObject::renderableObject() = default;
+objectData::objectData() = default;
 
-renderableObject::renderableObject(const char* obj_path, const char* txt_path): material(nullptr) {
+objectData::objectData(const char* obj_path, const char* txt_path): material(nullptr) {
     vertices = std::vector<glm::vec3>();
     uvs = std::vector<glm::vec2>();
     normals = std::vector<glm::vec3>();
@@ -22,7 +22,7 @@ renderableObject::renderableObject(const char* obj_path, const char* txt_path): 
     texture_id = loadBMP(txt_path);
 }
 
-void renderableObject::bindVBO(const GLuint program_id) {
+void objectData::bindVBO(const GLuint program_id) {
     GLuint vertex_buffer;
     glGenBuffers(1, &vertex_buffer);
     GLuint normal_buffer;
