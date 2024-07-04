@@ -10,6 +10,7 @@
 
 #include "glsl.h"
 #include "objloader.h"
+#include "renderableObject.h"
 #include "texture.h"
 
 using namespace std;
@@ -19,33 +20,23 @@ using namespace std;
 // Consts
 //--------------------------------------------------------------------------------
 
-const int WIDTH = 800, HEIGHT = 600;
+constexpr constexpr int WIDTH = 800, HEIGHT = 600;
 
 const char* fragshader_name = "fragmentshader.frag";
 const char* vertexshader_name = "vertexshader.vert";
 
-unsigned const int DELTA_TIME = 10;
+constexpr unsigned int DELTA_TIME = 10;
 
-unsigned const int NUM_OBJECTS = 3;
+constexpr unsigned int NUM_OBJECTS = 3;
 
 
 //--------------------------------------------------------------------------------
 // Typedefs
 //--------------------------------------------------------------------------------
 
-struct LightSource
-{
+struct LightSource {
     glm::vec3 position;
 };
-
-struct Material
-{
-    glm::vec3 ambient_color;
-    glm::vec3 diffuse_color;
-    glm::vec3 specular_color;
-    float power;
-};
-
 
 //--------------------------------------------------------------------------------
 // Variables
@@ -53,8 +44,8 @@ struct Material
 
 // ID's
 GLuint program_id;
-GLuint *vao = new GLuint[NUM_OBJECTS];
-GLuint *texture_id = new GLuint[NUM_OBJECTS];
+GLuint* vao = new GLuint[NUM_OBJECTS];
+// GLuint* texture_id = new GLuint[NUM_OBJECTS];
 
 // Uniform ID's
 GLuint uniform_mv;
@@ -67,29 +58,30 @@ GLuint uniform_material_power;
 
 // Matrices
 glm::mat4 view, projection;
-glm::mat4 *model = new glm::mat4[NUM_OBJECTS];
-glm::mat4 *mv = new glm::mat4[NUM_OBJECTS];
+glm::mat4* model = new glm::mat4[NUM_OBJECTS];
+glm::mat4* mv = new glm::mat4[NUM_OBJECTS];
 
 // Material and light
 LightSource light;
-Material *material = new Material[NUM_OBJECTS];
+Material* material = new Material[NUM_OBJECTS];
 
 
 //--------------------------------------------------------------------------------
 // Mesh variables
 //--------------------------------------------------------------------------------
 
-vector<glm::vec3> *vertices = new vector<glm::vec3>[NUM_OBJECTS];
-vector<glm::vec3> *normals = new vector<glm::vec3>[NUM_OBJECTS];
-vector<glm::vec2> *uvs = new vector<glm::vec2>[NUM_OBJECTS];
+renderableObject* objects = new renderableObject[NUM_OBJECTS];
+
+// vector<glm::vec3>* vertices = new vector<glm::vec3>[NUM_OBJECTS];
+// vector<glm::vec3>* normals = new vector<glm::vec3>[NUM_OBJECTS];
+// vector<glm::vec2>* uvs = new vector<glm::vec2>[NUM_OBJECTS];
 
 
 //--------------------------------------------------------------------------------
 // Keyboard handling
 //--------------------------------------------------------------------------------
 
-void keyboardHandler(unsigned char key, int a, int b)
-{
+void keyboardHandler(unsigned char key, int a, int b) {
     if (key == 27)
         glutExit();
 }
@@ -99,8 +91,7 @@ void keyboardHandler(unsigned char key, int a, int b)
 // Rendering
 //--------------------------------------------------------------------------------
 
-void Render()
-{
+void Render() {
     // Define background
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -108,19 +99,18 @@ void Render()
     // Attach to program_id
     glUseProgram(program_id);
     // Do transformations
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
+    for (int i = 0; i < NUM_OBJECTS; i++) {
         model[i] = glm::rotate(model[i], 0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
         mv[i] = view * model[i];
-        glBindTexture(GL_TEXTURE_2D, texture_id[i]);
-        glUniform3fv(uniform_material_ambient, 1, glm::value_ptr(material[i].ambient_color));
-        glUniform3fv(uniform_material_diffuse, 1, glm::value_ptr(material[i].diffuse_color));
-        glUniform3fv(uniform_specular, 1, glm::value_ptr(material[i].specular_color));
+        glBindTexture(GL_TEXTURE_2D, objects[i].texture_id);
+        glUniform3fv(uniform_material_ambient, 1, value_ptr(material[i].ambient_color));
+        glUniform3fv(uniform_material_diffuse, 1, value_ptr(material[i].diffuse_color));
+        glUniform3fv(uniform_specular, 1, value_ptr(material[i].specular_color));
         glUniform1f(uniform_material_power, material[i].power);
-        glUniformMatrix4fv(uniform_mv, 1, GL_FALSE, glm::value_ptr(mv[i]));
-        
+        glUniformMatrix4fv(uniform_mv, 1, GL_FALSE, value_ptr(mv[i]));
+
         glBindVertexArray(vao[i]);
-        glDrawArrays(GL_TRIANGLES, 0, vertices[i].size());
+        glDrawArrays(GL_TRIANGLES, 0, objects[i].vertices.size());
         glBindVertexArray(0);
     }
 
@@ -134,8 +124,7 @@ void Render()
 // Render method that is called by the timer function
 //------------------------------------------------------------
 
-void Render(int n)
-{
+void Render(int n) {
     Render();
     glutTimerFunc(DELTA_TIME, Render, 0);
 }
@@ -146,8 +135,7 @@ void Render(int n)
 // Initializes Glut and Glew
 //------------------------------------------------------------
 
-void InitGlutGlew(int argc, char** argv)
-{
+void InitGlutGlew(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
@@ -168,8 +156,7 @@ void InitGlutGlew(int argc, char** argv)
 // Initializes the fragmentshader and vertexshader
 //------------------------------------------------------------
 
-void InitShaders()
-{
+void InitShaders() {
     char* vertexshader = glsl::readFile(vertexshader_name);
     GLuint vsh_id = glsl::makeVertexShader(vertexshader);
 
@@ -184,13 +171,12 @@ void InitShaders()
 // void InitMatrices()
 //------------------------------------------------------------
 
-void InitMatrices()
-{
-    model[2] = glm::translate(model[2], glm::vec3(0.0, 0.0, 0.0));
-    model[1] = glm::translate(model[1], glm::vec3(-2.0, 0.0, 0.0));
-    model[0] = glm::translate(model[0], glm::vec3(2.0, 0.0, 0.0));
-    
-    view = glm::lookAt(
+void InitMatrices() {
+    model[2] = translate(model[2], glm::vec3(0.0, 0.0, 0.0));
+    model[1] = translate(model[1], glm::vec3(-2.0, 0.0, 0.0));
+    model[0] = translate(model[0], glm::vec3(2.0, 0.0, 0.0));
+
+    view = lookAt(
         glm::vec3(0.0, 2.0, 8.0),
         glm::vec3(0.0, 0.5, 0.0),
         glm::vec3(0.0, 1.0, 0.0));
@@ -198,7 +184,7 @@ void InitMatrices()
         glm::radians(45.0f),
         1.0f * WIDTH / HEIGHT, 0.1f,
         20.0f);
-    
+
     for (int i = 0; i < NUM_OBJECTS; i++)
         mv[i] = view * model[i];
 }
@@ -208,18 +194,13 @@ void InitMatrices()
 // void InitObjects()
 //------------------------------------------------------------
 
-void InitObjects()
-{
-    bool res;
-
+void InitObjects() {
     // Objects
     int i = 0;
-    res = loadOBJ("Objects/teapot.obj", vertices[i], uvs[i], normals[i++]);
-    res = loadOBJ("Objects/torus.obj", vertices[i], uvs[i], normals[i++]);
-    res = loadOBJ("Objects/box.obj", vertices[i], uvs[i], normals[i++]);
-    texture_id[0] = loadBMP("textures/Yellobrk.bmp");
-    texture_id[1] = loadBMP("textures/uvtemplate.bmp");
-    texture_id[2] = loadBMP("textures/Shrek.bmp");
+
+    objects[i++] = renderableObject("Objects/teapot.obj", "textures/Yellobrk.bmp");
+    objects[i++] = renderableObject("Objects/torus.obj", "textures/uvtemplate.bmp");
+    objects[i++] = renderableObject("Objects/box.obj", "textures/Shrek.bmp");
 }
 
 
@@ -227,11 +208,9 @@ void InitObjects()
 // void InitMaterialsLight()
 //------------------------------------------------------------
 
-void InitMaterialsLight()
-{
+void InitMaterialsLight() {
     light.position = glm::vec3(4.0, 4.0, 4.0);
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
+    for (int i = 0; i < NUM_OBJECTS; i++) {
         material[i].ambient_color = glm::vec3(0.2, 0.2, 0.1);
         material[i].diffuse_color = glm::vec3(0.5, 0.5, 0.3);
         material[i].specular_color = glm::vec3(0.5, 0.5, 0.5);
@@ -246,8 +225,7 @@ void InitMaterialsLight()
 // Allocates and fills buffers
 //------------------------------------------------------------
 
-void InitBuffers()
-{
+void InitBuffers() {
     GLuint position_id;
     GLuint normal_id;
     GLuint vbo_vertices;
@@ -265,8 +243,7 @@ void InitBuffers()
     // Stop bind to vao
     glBindVertexArray(0);
 
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
+    for (int i = 0; i < NUM_OBJECTS; i++) {
         // Allocate memory for vbo
         glGenBuffers(1, &vbo_vertices);
         glGenBuffers(1, &vbo_normals);
@@ -274,19 +251,21 @@ void InitBuffers()
 
         // Bind to vbo
         glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glBufferData(GL_ARRAY_BUFFER, vertices[i].size() * sizeof(glm::vec3), &vertices[i][0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, objects[i].vertices.size() * sizeof(glm::vec3), &objects[i].vertices[0],
+                     GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // Bind to vbo
         glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-        glBufferData(GL_ARRAY_BUFFER, normals[i].size() * sizeof(glm::vec3), &normals[i][0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, objects[i].normals.size() * sizeof(glm::vec3), &objects[i].normals[0],
+                     GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // Bind to vbo
         glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
-        glBufferData(GL_ARRAY_BUFFER, uvs[i].size() * sizeof(glm::vec2), &uvs[i][0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, objects[i].uvs.size() * sizeof(glm::vec2), &objects[i].uvs[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        
+
         // Allocate memory for vao
         glGenVertexArrays(1, &vao[i]);
 
@@ -295,19 +274,19 @@ void InitBuffers()
 
         // Bind vertices to vao
         glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
         glEnableVertexAttribArray(position_id);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // Bind normals to vao
         glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
         glEnableVertexAttribArray(normal_id);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // Bind uvs to vao
         glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
-        glVertexAttribPointer(uv_id, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(uv_id, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
         glEnableVertexAttribArray(uv_id);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -326,13 +305,12 @@ void InitBuffers()
     glUseProgram(program_id);
 
     // Fill uniform vars
-    glUniformMatrix4fv(uniform_proj, 1, GL_FALSE, glm::value_ptr(projection));
-    glUniform3fv(uniform_light_pos, 1, glm::value_ptr(light.position));
+    glUniformMatrix4fv(uniform_proj, 1, GL_FALSE, value_ptr(projection));
+    glUniform3fv(uniform_light_pos, 1, value_ptr(light.position));
 }
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     InitGlutGlew(argc, argv);
     InitShaders();
     InitMatrices();
