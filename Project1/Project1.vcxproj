@@ -137,12 +137,14 @@
         <ClCompile Include="glsl.cpp"/>
         <ClCompile Include="main.cpp"/>
         <ClCompile Include="objectData.cpp"/>
+        <ClCompile Include="objectScene.cpp"/>
         <ClCompile Include="objloader.cpp"/>
         <ClCompile Include="texture.cpp"/>
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="glsl.h"/>
         <ClInclude Include="objectData.h"/>
+        <ClInclude Include="objectScene.h"/>
         <ClInclude Include="objloader.h"/>
         <ClInclude Include="texture.h"/>
     </ItemGroup>

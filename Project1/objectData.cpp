@@ -7,7 +7,7 @@
 
 objectData::objectData() = default;
 
-objectData::objectData(const char* obj_path, const char* txt_path): material(nullptr) {
+objectData::objectData(const char* obj_path, const char* txt_path) {
     vertices = std::vector<glm::vec3>();
     uvs = std::vector<glm::vec2>();
     normals = std::vector<glm::vec3>();

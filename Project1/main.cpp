@@ -11,6 +11,7 @@
 #include "glsl.h"
 #include "objloader.h"
 #include "objectData.h"
+#include "objectScene.h"
 #include "texture.h"
 
 using namespace std;
@@ -58,19 +59,20 @@ GLuint uniform_material_power;
 
 // Matrices
 glm::mat4 view, projection;
-glm::mat4* model = new glm::mat4[NUM_OBJECTS];
+// glm::mat4* model = new glm::mat4[NUM_OBJECTS];
 glm::mat4* mv = new glm::mat4[NUM_OBJECTS];
 
 // Material and light
 LightSource light;
-Material* material = new Material[NUM_OBJECTS];
+// Material* material = new Material[NUM_OBJECTS];
 
 
 //--------------------------------------------------------------------------------
 // Mesh variables
 //--------------------------------------------------------------------------------
 
-objectData* objects = new objectData[NUM_OBJECTS];
+// objectData* objects = new objectData[NUM_OBJECTS];
+objectScene scene;
 
 // vector<glm::vec3>* vertices = new vector<glm::vec3>[NUM_OBJECTS];
 // vector<glm::vec3>* normals = new vector<glm::vec3>[NUM_OBJECTS];
@@ -99,18 +101,18 @@ void Render() {
     // Attach to program_id
     glUseProgram(program_id);
     // Do transformations
-    for (int i = 0; i < NUM_OBJECTS; i++) {
-        model[i] = glm::rotate(model[i], 0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
-        mv[i] = view * model[i];
-        glBindTexture(GL_TEXTURE_2D, objects[i].texture_id);
-        glUniform3fv(uniform_material_ambient, 1, value_ptr(material[i].ambient_color));
-        glUniform3fv(uniform_material_diffuse, 1, value_ptr(material[i].diffuse_color));
-        glUniform3fv(uniform_specular, 1, value_ptr(material[i].specular_color));
-        glUniform1f(uniform_material_power, material[i].power);
+    for (unsigned i = 0; i < scene.num_objects; i++) {
+        scene.objects[i].modelSpace.rotate(0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
+        mv[i] = view * scene.objects[i].modelSpace.model;
+        glBindTexture(GL_TEXTURE_2D, scene.objects[i].data.texture_id);
+        glUniform3fv(uniform_material_ambient, 1, value_ptr(scene.objects[i].material->ambient_color));
+        glUniform3fv(uniform_material_diffuse, 1, value_ptr(scene.objects[i].material->diffuse_color));
+        glUniform3fv(uniform_specular, 1, value_ptr(scene.objects[i].material->specular_color));
+        glUniform1f(uniform_material_power, scene.objects[i].material->power);
         glUniformMatrix4fv(uniform_mv, 1, GL_FALSE, value_ptr(mv[i]));
 
-        glBindVertexArray(objects[i].vao);
-        glDrawArrays(GL_TRIANGLES, 0, objects[i].vertices.size());
+        glBindVertexArray(scene.objects[i].data.vao);
+        glDrawArrays(GL_TRIANGLES, 0, scene.objects[i].data.vertices.size());
         glBindVertexArray(0);
     }
 
@@ -172,9 +174,9 @@ void InitShaders() {
 //------------------------------------------------------------
 
 void InitMatrices() {
-    model[2] = translate(model[2], glm::vec3(0.0, 0.0, 0.0));
-    model[1] = translate(model[1], glm::vec3(-2.0, 0.0, 0.0));
-    model[0] = translate(model[0], glm::vec3(2.0, 0.0, 0.0));
+    scene.objects[2].modelSpace.translate(glm::vec3(0.0, 0.0, 0.0));
+    scene.objects[1].modelSpace.translate(glm::vec3(-2.0, 0.0, 0.0));
+    scene.objects[0].modelSpace.translate(glm::vec3(2.0, 0.0, 0.0));
 
     view = lookAt(
         glm::vec3(0.0, 2.0, 8.0),
@@ -185,8 +187,8 @@ void InitMatrices() {
         1.0f * WIDTH / HEIGHT, 0.1f,
         20.0f);
 
-    for (int i = 0; i < NUM_OBJECTS; i++)
-        mv[i] = view * model[i];
+    for (unsigned i = 0; i < scene.num_objects; i++)
+        mv[i] = view * scene.objects[i].modelSpace.model;
 }
 
 
@@ -195,12 +197,9 @@ void InitMatrices() {
 //------------------------------------------------------------
 
 void InitObjects() {
-    // Objects
-    int i = 0;
-
-    objects[i++] = objectData("Objects/teapot.obj", "textures/Yellobrk.bmp");
-    objects[i++] = objectData("Objects/torus.obj", "textures/uvtemplate.bmp");
-    objects[i++] = objectData("Objects/box.obj", "textures/Shrek.bmp");
+    scene.addObject("Objects/teapot.obj", "textures/Yellobrk.bmp", new Material());
+    scene.addObject("Objects/torus.obj", "textures/uvtemplate.bmp", new Material());
+    scene.addObject("Objects/box.obj", "textures/Shrek.bmp", new Material());
 }
 
 
@@ -210,11 +209,11 @@ void InitObjects() {
 
 void InitMaterialsLight() {
     light.position = glm::vec3(4.0, 4.0, 4.0);
-    for (int i = 0; i < NUM_OBJECTS; i++) {
-        material[i].ambient_color = glm::vec3(0.2, 0.2, 0.1);
-        material[i].diffuse_color = glm::vec3(0.5, 0.5, 0.3);
-        material[i].specular_color = glm::vec3(0.5, 0.5, 0.5);
-        material[i].power = 50.0;
+    for (int i = 0; i < scene.num_objects; i++) {
+        scene.objects[i].material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
+        scene.objects[i].material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
+        scene.objects[i].material->specular_color = glm::vec3(0.5, 0.5, 0.5);
+        scene.objects[i].material->power = 50.0;
     }
     // material.diffuse_color = glm::vec3(0.5, 0.0, 0.0);
 }
@@ -226,7 +225,7 @@ void InitMaterialsLight() {
 //------------------------------------------------------------
 
 void InitBuffers() {
-    for (int i = 0; i < NUM_OBJECTS; i++) { objects[i].bindVBO(program_id); }
+    scene.bindVBO(program_id);
 
     // Make uniform vars
     uniform_mv = glGetUniformLocation(program_id, "mv");
@@ -250,8 +249,8 @@ void InitBuffers() {
 int main(int argc, char** argv) {
     InitGlutGlew(argc, argv);
     InitShaders();
-    InitMatrices();
     InitObjects();
+    InitMatrices();
     InitMaterialsLight();
     InitBuffers();
 
