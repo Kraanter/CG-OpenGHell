@@ -21,6 +21,17 @@ public:
     void reset();
 };
 
+struct UniformVars {
+    GLuint uniform_mv;
+    GLuint uniform_proj;
+    GLuint uniform_light_pos;
+    GLuint uniform_material_ambient;
+    GLuint uniform_material_diffuse;
+    GLuint uniform_specular;
+    GLuint uniform_material_power;
+};
+
+
 class object {
 public:
     object(objectData data, Material* material);
@@ -30,17 +41,19 @@ public:
 
 
     void bindVBO(GLuint program_id);
-    void render(GLuint program_id, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void render(UniformVars uVars, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
 };
 
 class objectScene {
 public:
     objectScene();
 
+    UniformVars uniform_vars;
     std::vector<object> objects;
     unsigned int num_objects = 0;
 
     void addObject(const char* obj_path, const char* txt_path, Material* material);
     void bindVBO(GLuint program_id);
-    void render(GLuint program_id, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void fillUniformVars(glm::mat4 projection, glm::vec3 light_pos);
+    void render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
 };

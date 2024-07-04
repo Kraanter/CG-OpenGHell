@@ -9,10 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "glsl.h"
-#include "objloader.h"
-#include "objectData.h"
 #include "objectScene.h"
-#include "texture.h"
 
 using namespace std;
 
@@ -101,20 +98,7 @@ void Render() {
     // Attach to program_id
     glUseProgram(program_id);
     // Do transformations
-    for (unsigned i = 0; i < scene.num_objects; i++) {
-        scene.objects[i].modelSpace.rotate(0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
-        mv[i] = view * scene.objects[i].modelSpace.model;
-        glBindTexture(GL_TEXTURE_2D, scene.objects[i].data.texture_id);
-        glUniform3fv(uniform_material_ambient, 1, value_ptr(scene.objects[i].material->ambient_color));
-        glUniform3fv(uniform_material_diffuse, 1, value_ptr(scene.objects[i].material->diffuse_color));
-        glUniform3fv(uniform_specular, 1, value_ptr(scene.objects[i].material->specular_color));
-        glUniform1f(uniform_material_power, scene.objects[i].material->power);
-        glUniformMatrix4fv(uniform_mv, 1, GL_FALSE, value_ptr(mv[i]));
-
-        glBindVertexArray(scene.objects[i].data.vao);
-        glDrawArrays(GL_TRIANGLES, 0, scene.objects[i].data.vertices.size());
-        glBindVertexArray(0);
-    }
+    scene.render(view, projection, light.position);
 
     // Swap buffers
     glutSwapBuffers();
@@ -174,21 +158,15 @@ void InitShaders() {
 //------------------------------------------------------------
 
 void InitMatrices() {
-    scene.objects[2].modelSpace.translate(glm::vec3(0.0, 0.0, 0.0));
-    scene.objects[1].modelSpace.translate(glm::vec3(-2.0, 0.0, 0.0));
-    scene.objects[0].modelSpace.translate(glm::vec3(2.0, 0.0, 0.0));
-
     view = lookAt(
         glm::vec3(0.0, 2.0, 8.0),
         glm::vec3(0.0, 0.5, 0.0),
         glm::vec3(0.0, 1.0, 0.0));
+
     projection = glm::perspective(
         glm::radians(45.0f),
         1.0f * WIDTH / HEIGHT, 0.1f,
         20.0f);
-
-    for (unsigned i = 0; i < scene.num_objects; i++)
-        mv[i] = view * scene.objects[i].modelSpace.model;
 }
 
 
@@ -200,6 +178,10 @@ void InitObjects() {
     scene.addObject("Objects/teapot.obj", "textures/Yellobrk.bmp", new Material());
     scene.addObject("Objects/torus.obj", "textures/uvtemplate.bmp", new Material());
     scene.addObject("Objects/box.obj", "textures/Shrek.bmp", new Material());
+
+    scene.objects[2].modelSpace.translate(glm::vec3(0.0, 0.0, 0.0));
+    scene.objects[1].modelSpace.translate(glm::vec3(-2.0, 0.0, 0.0));
+    scene.objects[0].modelSpace.translate(glm::vec3(2.0, 0.0, 0.0));
 }
 
 
@@ -224,25 +206,15 @@ void InitMaterialsLight() {
 // Allocates and fills buffers
 //------------------------------------------------------------
 
+
 void InitBuffers() {
     scene.bindVBO(program_id);
-
-    // Make uniform vars
-    uniform_mv = glGetUniformLocation(program_id, "mv");
-    uniform_proj = glGetUniformLocation(program_id, "projection");
-    uniform_light_pos = glGetUniformLocation(program_id, "light_pos");
-    uniform_material_ambient = glGetUniformLocation(program_id, "mat_ambient");
-    uniform_material_diffuse = glGetUniformLocation(program_id, "mat_diffuse");
-    uniform_specular = glGetUniformLocation(program_id, "mat_specular");
-    uniform_material_power = glGetUniformLocation(program_id, "mat_power");
-
 
     // Attach to program (needed to fill uniform vars)
     glUseProgram(program_id);
 
     // Fill uniform vars
-    glUniformMatrix4fv(uniform_proj, 1, GL_FALSE, value_ptr(projection));
-    glUniform3fv(uniform_light_pos, 1, value_ptr(light.position));
+    scene.fillUniformVars(projection, light.position);
 }
 
 
