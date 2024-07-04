@@ -185,11 +185,12 @@ Material* createMaterial() {
 }
 
 void InitObjects() {
-    scene.addObject("Objects/teapot.obj", "textures/Yellobrk.bmp", createMaterial());
-    scene.addObject("Objects/torus.obj", "textures/uvtemplate.bmp", createMaterial());
-    scene.addObject("Objects/box.obj", "textures/Shrek.bmp", createMaterial());
+    scene.addObject("Objects/teapot.obj", "textures/Shrek.bmp", createMaterial());
+    scene.addObject("Objects/torus.obj", "textures/Yellobrk.bmp", createMaterial());
+    scene.addObject("objects/Asseto corsa/Audi R8 GT4/3d.obj", "textures/uvtemplate.bmp", createMaterial());
 
     scene.objects[2].modelSpace.translate(glm::vec3(0.0, 0.0, 0.0));
+    scene.objects[2].modelSpace.scale(glm::vec3(0.005, 0.005, 0.005));
     scene.objects[1].modelSpace.translate(glm::vec3(-2.0, 0.0, 0.0));
     scene.objects[0].modelSpace.translate(glm::vec3(2.0, 0.0, 0.0));
 }
