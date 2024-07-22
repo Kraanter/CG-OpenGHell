@@ -17,9 +17,10 @@ public:
     glm::mat4 model;
 
     ModelSpace();
-    void translate(glm::vec3 translation);
-    void rotate(float angle, glm::vec3 axis);
-    void scale(glm::vec3 scale);
+    ModelSpace* translate(glm::vec3 translation);
+    ModelSpace* rotate(float angle, glm::vec3 axis);
+    ModelSpace* scale(glm::vec3 scale);
+    ModelSpace* scale(float scale);
     void reset();
 };
 

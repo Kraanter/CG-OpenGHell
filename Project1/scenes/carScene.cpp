@@ -56,7 +56,7 @@ void carScene::resetAndInit() {
     objects.clear();
 
     addObject("Objects/Eigen/exports/auto_suv.obj", "textures/auto_texture_flip.bmp", createMaterial())->
-        modelSpace.translate(glm::vec3(1.0, 0.0, 0.0));
-    addObject("Objects/Eigen/exports/auto_suv.obj", "textures/uvtemplate.bmp", createMaterial())->
-        modelSpace.translate(glm::vec3(-1.0, 0.0, 0.0));
+        modelSpace.translate(glm::vec3(0.0, 0.147, 0.0));
+    addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial())->
+        modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(glm::vec3(0.25));
 }

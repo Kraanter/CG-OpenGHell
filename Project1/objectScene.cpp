@@ -4,13 +4,31 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "glsl.h"
+
 ModelSpace::ModelSpace(): model(glm::mat4(1.0f)) {}
 
 void ModelSpace::reset() { model = glm::mat4(1.0f); }
-void ModelSpace::translate(glm::vec3 translation) { model = glm::translate(model, translation); }
-void ModelSpace::rotate(float angle, glm::vec3 axis) { model = glm::rotate(model, angle, axis); }
-void ModelSpace::scale(glm::vec3 scale) { model = glm::scale(model, scale); }
 
+ModelSpace* ModelSpace::translate(glm::vec3 translation) {
+    model = glm::translate(model, translation);
+    return this;
+}
+
+ModelSpace* ModelSpace::rotate(float angle, glm::vec3 axis) {
+    model = glm::rotate(model, angle, axis);
+    return this;
+}
+
+ModelSpace* ModelSpace::scale(glm::vec3 scale) {
+    model = glm::scale(model, scale);
+    return this;
+}
+
+ModelSpace* ModelSpace::scale(float scale) {
+    model = glm::scale(model, glm::vec3(scale));
+    return this;
+}
 
 object::object(objectData data, Material* material) : data(data), material(material), modelSpace(ModelSpace()) {}
 
