@@ -139,6 +139,7 @@
         <ClCompile Include="objectData.cpp"/>
         <ClCompile Include="objectScene.cpp"/>
         <ClCompile Include="objloader.cpp"/>
+        <ClCompile Include="sceneManager.cpp"/>
         <ClCompile Include="texture.cpp"/>
     </ItemGroup>
     <ItemGroup>
@@ -146,6 +147,7 @@
         <ClInclude Include="objectData.h"/>
         <ClInclude Include="objectScene.h"/>
         <ClInclude Include="objloader.h"/>
+        <ClInclude Include="sceneManager.h"/>
         <ClInclude Include="texture.h"/>
     </ItemGroup>
     <ItemGroup>
@@ -369,10 +371,19 @@
         <Content Include="objects\box.obj"/>
         <Content Include="objects\cylinder18.obj"/>
         <Content Include="objects\cylinder32.obj"/>
+        <Content Include="objects\Eigen\Blender\plateau.blend"/>
+        <Content Include="objects\Eigen\Blender\plateau.blend1"/>
+        <Content Include="objects\Eigen\Blender\track_curb.blend"/>
+        <Content Include="objects\Eigen\Blender\track_curb.blend1"/>
+        <Content Include="objects\Eigen\Exports\plateau.mtl"/>
+        <Content Include="objects\Eigen\Exports\plateau.obj"/>
+        <Content Include="objects\Eigen\Exports\track_curb.mtl"/>
+        <Content Include="objects\Eigen\Exports\track_curb.obj"/>
         <Content Include="objects\sphere.obj"/>
         <Content Include="objects\teapot.obj"/>
         <Content Include="objects\torus.obj"/>
         <Content Include="textures\Shrek.bmp"/>
+        <Content Include="textures\track_curb_texture.bmp"/>
         <Content Include="textures\uvmap.DDS"/>
         <Content Include="textures\uvtemplate.bmp"/>
         <Content Include="textures\Yellobrk.bmp"/>

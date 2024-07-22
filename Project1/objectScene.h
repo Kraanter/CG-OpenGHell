@@ -38,22 +38,22 @@ public:
     objectData data;
     Material* material;
     ModelSpace modelSpace;
+    bool visible = true;
 
 
     void bindVBO(GLuint program_id);
     void render(UniformVars uVars, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void debugPrint();
 };
 
 class objectScene {
 public:
-    objectScene();
-
-    UniformVars uniform_vars;
+    UniformVars* uniform_vars;
     std::vector<object> objects;
     unsigned int num_objects = 0;
 
-    void addObject(const char* obj_path, const char* txt_path, Material* material);
-    void bindVBO(GLuint program_id);
-    void fillUniformVars(glm::mat4 projection, glm::vec3 light_pos);
+    objectScene();
+    object* addObject(const char* obj_path, const char* txt_path, Material* material);
     void render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
 };

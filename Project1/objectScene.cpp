@@ -1,5 +1,6 @@
 ﻿#include "objectScene.h"
 
+#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -16,7 +17,7 @@ object::object(objectData data, Material* material) : data(data), material(mater
 void object::bindVBO(GLuint program_id) { data.bindVBO(program_id); }
 
 void object::render(UniformVars uVars, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos) {
-    modelSpace.rotate(0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
+    // modelSpace.rotate(0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
     glm::mat4 mv = view * modelSpace.model;
     glBindTexture(GL_TEXTURE_2D, data.texture_id);
     glUniform3fv(uVars.uniform_material_ambient, 1, value_ptr(material->ambient_color));
@@ -30,32 +31,39 @@ void object::render(UniformVars uVars, glm::mat4 view, glm::mat4 projection, glm
     glBindVertexArray(0);
 }
 
-objectScene::objectScene() {}
+void object::debugPrint() {
+    // print this->data.uvs, this->data.normals, this->data.vertices
+    std::cout << "UVs:\n";
+    std::cout << data.uvs.size() << '\n';
+    for (auto& uv : data.uvs) { std::cout << uv.x << ' ' << uv.y << '\n'; }
+    // std::cout << "Normals:\n";
+    // for (auto& normal : data.normals) { std::cout << normal.x << ' ' << normal.y << ' ' << normal.z << '\n'; }
+    // std::cout << "Vertices:\n";
+    // for (auto& vertex : data.vertices) { std::cout << vertex.x << ' ' << vertex.y << ' ' << vertex.z << '\n'; }
+}
 
-void objectScene::addObject(const char* obj_path, const char* txt_path, Material* material) {
+objectScene::objectScene() = default;
+
+
+object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material) {
     objectData data(obj_path, txt_path);
     object obj(data, material);
     objects.push_back(obj);
     num_objects++;
+
+    return &objects[num_objects - 1];
 }
 
-void objectScene::bindVBO(GLuint program_id) {
-    uniform_vars.uniform_mv = glGetUniformLocation(program_id, "mv");
-    uniform_vars.uniform_proj = glGetUniformLocation(program_id, "projection");
-    uniform_vars.uniform_light_pos = glGetUniformLocation(program_id, "light_pos");
-    uniform_vars.uniform_material_ambient = glGetUniformLocation(program_id, "mat_ambient");
-    uniform_vars.uniform_material_diffuse = glGetUniformLocation(program_id, "mat_diffuse");
-    uniform_vars.uniform_specular = glGetUniformLocation(program_id, "mat_specular");
-    uniform_vars.uniform_material_power = glGetUniformLocation(program_id, "mat_power");
-
-    for (auto& obj : objects) { obj.bindVBO(program_id); }
-}
 
 void objectScene::render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos) {
-    for (auto& obj : objects) { obj.render(uniform_vars, view, projection, light_pos); }
+    for (auto& obj : objects)
+        if (obj.visible)
+            obj.render(*uniform_vars, view, projection, light_pos);
 }
 
-void objectScene::fillUniformVars(glm::mat4 projection, glm::vec3 light_pos) {
-    glUniformMatrix4fv(uniform_vars.uniform_proj, 1, GL_FALSE, value_ptr(projection));
-    glUniform3fv(uniform_vars.uniform_light_pos, 1, value_ptr(light_pos));
+void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program_id) {
+    this->uniform_vars = uniform_vars;
+
+    for (auto& obj : objects)
+        obj.bindVBO(program_id);
 }

@@ -10,6 +10,7 @@
 
 #include "glsl.h"
 #include "objectScene.h"
+#include "sceneManager.h"
 
 using namespace std;
 
@@ -69,7 +70,7 @@ LightSource light;
 //--------------------------------------------------------------------------------
 
 // objectData* objects = new objectData[NUM_OBJECTS];
-objectScene scene;
+sceneManager stage_manager;
 
 // vector<glm::vec3>* vertices = new vector<glm::vec3>[NUM_OBJECTS];
 // vector<glm::vec3>* normals = new vector<glm::vec3>[NUM_OBJECTS];
@@ -83,6 +84,12 @@ objectScene scene;
 void keyboardHandler(unsigned char key, int a, int b) {
     if (key == 27)
         glutExit();
+
+    const int num = key - '0';
+    objectScene* scene = stage_manager.currentScene();
+    if (num >= 0 && scene->num_objects > num) { scene->objects[num].visible = !scene->objects[num].visible; }
+
+    if (key == 'n') { stage_manager.nextScene(); }
 }
 
 
@@ -98,7 +105,7 @@ void Render() {
     // Attach to program_id
     glUseProgram(program_id);
     // Do transformations
-    scene.render(view, projection, light.position);
+    stage_manager.render(view, projection, light.position);
 
     // Swap buffers
     glutSwapBuffers();
@@ -159,14 +166,14 @@ void InitShaders() {
 
 void InitMatrices() {
     view = lookAt(
-        glm::vec3(0.0, 2.0, 8.0),
+        glm::vec3(0.0, 12.0, 100.0),
         glm::vec3(0.0, 0.5, 0.0),
         glm::vec3(0.0, 1.0, 0.0));
 
     projection = glm::perspective(
         glm::radians(45.0f),
         1.0f * WIDTH / HEIGHT, 0.1f,
-        20.0f);
+        2000.0f);
 }
 
 
@@ -184,15 +191,22 @@ Material* createMaterial() {
     return material;
 }
 
-void InitObjects() {
-    scene.addObject("Objects/teapot.obj", "textures/Shrek.bmp", createMaterial());
-    scene.addObject("Objects/torus.obj", "textures/Yellobrk.bmp", createMaterial());
-    scene.addObject("objects/Asseto corsa/Audi R8 GT4/3d.obj", "textures/uvtemplate.bmp", createMaterial());
+constexpr int COUNT = 1000;
 
-    scene.objects[2].modelSpace.translate(glm::vec3(0.0, 0.0, 0.0));
-    scene.objects[2].modelSpace.scale(glm::vec3(0.005, 0.005, 0.005));
-    scene.objects[1].modelSpace.translate(glm::vec3(-2.0, 0.0, 0.0));
-    scene.objects[0].modelSpace.translate(glm::vec3(2.0, 0.0, 0.0));
+void InitObjects() {
+    objectScene scene;
+    for (int i = 0; i < COUNT; i++) {
+        object* obj = scene.addObject("Objects/Eigen/exports/track_curb.obj", "textures/track_curb_texture.bmp",
+                                      createMaterial());
+        obj->modelSpace.translate(glm::vec3(0.0, 0.0, i * 2.0 - COUNT));
+    }
+    stage_manager.addScene(scene);
+
+    objectScene scene2;
+
+    scene2.addObject("Objects/Eigen/exports/plateau.obj", "textures/uvtemplate.bmp", createMaterial());
+
+    stage_manager.addScene(scene2);
 }
 
 
@@ -210,13 +224,13 @@ void InitMaterialsLight() { light.position = glm::vec3(4.0, 4.0, 4.0); }
 
 
 void InitBuffers() {
-    scene.bindVBO(program_id);
+    stage_manager.bindVBO(program_id);
 
     // Attach to program (needed to fill uniform vars)
     glUseProgram(program_id);
 
     // Fill uniform vars
-    scene.fillUniformVars(projection, light.position);
+    stage_manager.fillUniformVars(projection, light.position);
 }
 
 

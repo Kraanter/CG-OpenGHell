@@ -1,25 +1,40 @@
 ﻿#include "objectData.h"
 
 #include <iostream>
+#include <map>
 
 #include "objloader.h"
 #include "texture.h"
 
 objectData::objectData() = default;
 
+// Dictionary of obj_path and list of vertices, uvs, normals
+std::map<std::string, std::tuple<std::vector<glm::vec3>, std::vector<glm::vec2>, std::vector<glm::vec3>>>
+obj_cache = {};
+
+// Dictionary of txt_path and texture_id
+std::map<std::string, GLuint> txt_cache = {};
+
 objectData::objectData(const char* obj_path, const char* txt_path) {
     vertices = std::vector<glm::vec3>();
     uvs = std::vector<glm::vec2>();
     normals = std::vector<glm::vec3>();
-
-    bool res;
-    res = loadOBJ(obj_path, vertices, uvs, normals);
-    if (!res) {
-        std::cerr << "Failed to load object file: " << obj_path << '\n';
-        exit(1);
+    if (obj_cache.find(obj_path) != obj_cache.end()) { std::tie(vertices, uvs, normals) = obj_cache.at(obj_path); }
+    else {
+        bool res;
+        res = loadOBJ(obj_path, vertices, uvs, normals);
+        if (!res) {
+            std::cerr << "Failed to load object file: " << obj_path << '\n';
+            exit(1);
+        }
+        obj_cache[obj_path] = std::make_tuple(vertices, uvs, normals);
     }
 
-    texture_id = loadBMP(txt_path);
+    if (txt_cache.find(txt_path) != txt_cache.end()) { texture_id = txt_cache.at(txt_path); }
+    else {
+        texture_id = loadBMP(txt_path);
+        txt_cache[txt_path] = texture_id;
+    }
 }
 
 void objectData::bindVBO(const GLuint program_id) {
