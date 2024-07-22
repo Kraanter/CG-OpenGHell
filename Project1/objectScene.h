@@ -54,6 +54,35 @@ public:
     virtual glm::vec3 startCameraPos() { return glm::vec3(1.0, 1.0, 0.0); }
     virtual glm::vec3 startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
 
+    virtual void keyboardHandler(unsigned char key) {
+        switch (key) {
+        case 'w':
+            cameraPos.z -= 0.1;
+            centerPos.z -= 0.1;
+            break;
+        case 's':
+            cameraPos.z += 0.1;
+            centerPos.z += 0.1;
+            break;
+        case 'a':
+            cameraPos.x -= 0.1;
+            centerPos.x -= 0.1;
+            break;
+        case 'd':
+            cameraPos.x += 0.1;
+            centerPos.x += 0.1;
+            break;
+        case 'q':
+            cameraPos.y -= 0.1;
+            centerPos.y -= 0.1;
+            break;
+        case 'e':
+            cameraPos.y += 0.1;
+            centerPos.y += 0.1;
+            break;
+        }
+    }
+
     virtual void resetAndInit() {
         cameraPos = startCameraPos();
         centerPos = startCenterPos();
