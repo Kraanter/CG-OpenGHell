@@ -16,15 +16,15 @@ object::object(objectData data, Material* material) : data(data), material(mater
 
 void object::bindVBO(GLuint program_id) { data.bindVBO(program_id); }
 
-void object::render(UniformVars uVars, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos) {
+void object::render(const UniformVars* uVars, const glm::mat4* view, glm::vec3 light_pos) {
     // modelSpace.rotate(0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
-    glm::mat4 mv = view * modelSpace.model;
+    glm::mat4 mv = *view * modelSpace.model;
     glBindTexture(GL_TEXTURE_2D, data.texture_id);
-    glUniform3fv(uVars.uniform_material_ambient, 1, value_ptr(material->ambient_color));
-    glUniform3fv(uVars.uniform_material_diffuse, 1, value_ptr(material->diffuse_color));
-    glUniform3fv(uVars.uniform_specular, 1, value_ptr(material->specular_color));
-    glUniform1f(uVars.uniform_material_power, material->power);
-    glUniformMatrix4fv(uVars.uniform_mv, 1, GL_FALSE, value_ptr(mv));
+    glUniform3fv(uVars->uniform_material_ambient, 1, value_ptr(material->ambient_color));
+    glUniform3fv(uVars->uniform_material_diffuse, 1, value_ptr(material->diffuse_color));
+    glUniform3fv(uVars->uniform_specular, 1, value_ptr(material->specular_color));
+    glUniform1f(uVars->uniform_material_power, material->power);
+    glUniformMatrix4fv(uVars->uniform_mv, 1, GL_FALSE, value_ptr(mv));
 
     glBindVertexArray(data.vao);
     glDrawArrays(GL_TRIANGLES, 0, data.vertices.size());
@@ -55,10 +55,12 @@ object* objectScene::addObject(const char* obj_path, const char* txt_path, Mater
 }
 
 
-void objectScene::render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos) {
+void objectScene::render(glm::vec3 light_pos) {
     for (auto& obj : objects)
-        if (obj.visible)
-            obj.render(*uniform_vars, view, projection, light_pos);
+        if (obj.visible) {
+            glm::mat4 curViewMat = currentViewMat();
+            obj.render(uniform_vars, &curViewMat, light_pos);
+        }
 }
 
 void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program_id) {

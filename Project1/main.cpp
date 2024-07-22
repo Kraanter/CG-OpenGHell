@@ -19,15 +19,12 @@ using namespace std;
 // Consts
 //--------------------------------------------------------------------------------
 
-constexpr constexpr int WIDTH = 800, HEIGHT = 600;
+constexpr constexpr int WIDTH = 800, HEIGHT = 800;
 
 const char* fragshader_name = "fragmentshader.frag";
 const char* vertexshader_name = "vertexshader.vert";
 
 constexpr unsigned int DELTA_TIME = 10;
-
-constexpr unsigned int NUM_OBJECTS = 3;
-
 
 //--------------------------------------------------------------------------------
 // Typedefs
@@ -43,39 +40,16 @@ struct LightSource {
 
 // ID's
 GLuint program_id;
-// GLuint* vao = new GLuint[NUM_OBJECTS];
-// GLuint* texture_id = new GLuint[NUM_OBJECTS];
-
-// Uniform ID's
-GLuint uniform_mv;
-GLuint uniform_proj;
-GLuint uniform_light_pos;
-GLuint uniform_material_ambient;
-GLuint uniform_material_diffuse;
-GLuint uniform_specular;
-GLuint uniform_material_power;
-
-// Matrices
-glm::mat4 view, projection;
-// glm::mat4* model = new glm::mat4[NUM_OBJECTS];
-glm::mat4* mv = new glm::mat4[NUM_OBJECTS];
 
 // Material and light
 LightSource light;
-// Material* material = new Material[NUM_OBJECTS];
 
 
 //--------------------------------------------------------------------------------
 // Mesh variables
 //--------------------------------------------------------------------------------
 
-// objectData* objects = new objectData[NUM_OBJECTS];
 sceneManager stage_manager;
-
-// vector<glm::vec3>* vertices = new vector<glm::vec3>[NUM_OBJECTS];
-// vector<glm::vec3>* normals = new vector<glm::vec3>[NUM_OBJECTS];
-// vector<glm::vec2>* uvs = new vector<glm::vec2>[NUM_OBJECTS];
-
 
 //--------------------------------------------------------------------------------
 // Keyboard handling
@@ -105,7 +79,7 @@ void Render() {
     // Attach to program_id
     glUseProgram(program_id);
     // Do transformations
-    stage_manager.render(view, projection, light.position);
+    stage_manager.render(light.position);
 
     // Swap buffers
     glutSwapBuffers();
@@ -164,17 +138,7 @@ void InitShaders() {
 // void InitMatrices()
 //------------------------------------------------------------
 
-void InitMatrices() {
-    view = lookAt(
-        glm::vec3(0.0, 12.0, 100.0),
-        glm::vec3(0.0, 0.5, 0.0),
-        glm::vec3(0.0, 1.0, 0.0));
-
-    projection = glm::perspective(
-        glm::radians(45.0f),
-        1.0f * WIDTH / HEIGHT, 0.1f,
-        2000.0f);
-}
+void InitMatrices() {}
 
 
 //------------------------------------------------------------
@@ -200,13 +164,20 @@ void InitObjects() {
                                       createMaterial());
         obj->modelSpace.translate(glm::vec3(0.0, 0.0, i * 2.0 - COUNT));
     }
-    stage_manager.addScene(scene);
+
+    scene.cameraPos = glm::vec3(0.0, 12.0, 100.0);
 
     objectScene scene2;
 
-    scene2.addObject("Objects/Eigen/exports/plateau.obj", "textures/uvtemplate.bmp", createMaterial());
+    scene2.addObject("Objects/Eigen/exports/auto_suv.obj", "textures/auto_texture_flip.bmp", createMaterial())->
+           modelSpace.translate(glm::vec3(1.0, 0.0, 0.0));
+    scene2.addObject("Objects/Eigen/exports/auto_suv.obj", "textures/uvtemplate.bmp", createMaterial())->
+           modelSpace.translate(glm::vec3(-1.0, 0.0, 0.0));
+
+    scene2.cameraPos = glm::vec3(0.0, 2.0, 6.0);
 
     stage_manager.addScene(scene2);
+    stage_manager.addScene(scene);
 }
 
 
@@ -230,7 +201,7 @@ void InitBuffers() {
     glUseProgram(program_id);
 
     // Fill uniform vars
-    stage_manager.fillUniformVars(projection, light.position);
+    stage_manager.fillUniformVars(glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f), light.position);
 }
 
 

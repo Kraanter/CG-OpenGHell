@@ -7,9 +7,7 @@ sceneManager::sceneManager() {
     uniform_vars = UniformVars();
 };
 
-void sceneManager::render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos) {
-    scenes_[current_scene_].render(view, projection, light_pos);
-}
+void sceneManager::render(glm::vec3 light_pos) { scenes_[current_scene_].render(light_pos); }
 
 void sceneManager::bindVBO(GLuint program_id) {
     this->program_id = program_id;

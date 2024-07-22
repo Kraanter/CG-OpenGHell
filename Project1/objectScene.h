@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <vector>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "objectData.h"
 
@@ -42,7 +43,7 @@ public:
 
 
     void bindVBO(GLuint program_id);
-    void render(UniformVars uVars, glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void render(const UniformVars* uVars, const glm::mat4* view, glm::vec3 light_pos);
     void debugPrint();
 };
 
@@ -52,8 +53,14 @@ public:
     std::vector<object> objects;
     unsigned int num_objects = 0;
 
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 centerPos = glm::vec3(0.0f, 0.0f, 0.0f);
+
     objectScene();
     object* addObject(const char* obj_path, const char* txt_path, Material* material);
-    void render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void render(glm::vec3 light_pos);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
+
+private:
+    glm::mat4 currentViewMat() { return lookAt(cameraPos, centerPos, glm::vec3(0.0, 1.0, 0.0)); }
 };

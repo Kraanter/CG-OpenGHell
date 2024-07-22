@@ -8,7 +8,7 @@ public:
     objectScene* operator[](int index) { return &scenes_[index]; }
     void addScene(objectScene scene) { scenes_.push_back(scene); }
     objectScene* currentScene() { return &scenes_[current_scene_]; }
-    void render(glm::mat4 view, glm::mat4 projection, glm::vec3 light_pos);
+    void render(glm::vec3 light_pos);
 
     void setSelectedScene(unsigned sceneNr) {
         if (sceneNr < scenes_.size())
