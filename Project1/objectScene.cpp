@@ -42,7 +42,12 @@ void object::debugPrint() {
     // for (auto& vertex : data.vertices) { std::cout << vertex.x << ' ' << vertex.y << ' ' << vertex.z << '\n'; }
 }
 
-objectScene::objectScene() = default;
+objectScene::objectScene() {
+    std::cout << "objectScene constructor\n";
+    cameraPos = startCameraPos();
+    centerPos = startCenterPos();
+    resetAndInit();
+};
 
 
 object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material) {
@@ -68,4 +73,13 @@ void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program
 
     for (auto& obj : objects)
         obj.bindVBO(program_id);
+}
+
+Material* objectScene::createMaterial() {
+    const auto material = new Material();
+    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
+    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
+    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
+    material->power = 50.0;
+    return material;
 }

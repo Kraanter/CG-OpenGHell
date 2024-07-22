@@ -140,6 +140,8 @@
         <ClCompile Include="objectScene.cpp"/>
         <ClCompile Include="objloader.cpp"/>
         <ClCompile Include="sceneManager.cpp"/>
+        <ClCompile Include="scenes\carScene.cpp"/>
+        <ClCompile Include="scenes\trackScene.cpp"/>
         <ClCompile Include="texture.cpp"/>
     </ItemGroup>
     <ItemGroup>
@@ -148,6 +150,8 @@
         <ClInclude Include="objectScene.h"/>
         <ClInclude Include="objloader.h"/>
         <ClInclude Include="sceneManager.h"/>
+        <ClInclude Include="scenes\carScene.h"/>
+        <ClInclude Include="scenes\trackScene.h"/>
         <ClInclude Include="texture.h"/>
     </ItemGroup>
     <ItemGroup>

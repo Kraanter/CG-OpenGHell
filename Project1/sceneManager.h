@@ -5,9 +5,9 @@
 
 class sceneManager {
 public:
-    objectScene* operator[](int index) { return &scenes_[index]; }
-    void addScene(objectScene scene) { scenes_.push_back(scene); }
-    objectScene* currentScene() { return &scenes_[current_scene_]; }
+    objectScene* operator[](int index) { return scenes_[index]; }
+    void addScene(objectScene* scene) { scenes_.push_back(scene); }
+    objectScene* currentScene() { return scenes_[current_scene_]; }
     void render(glm::vec3 light_pos);
 
     void setSelectedScene(unsigned sceneNr) {
@@ -25,7 +25,7 @@ public:
     void bindVBO(GLuint program_id);
 
     sceneManager();
-    std::vector<objectScene> scenes_;
+    std::vector<objectScene*> scenes_;
     unsigned num_scenes_ = 0;
     unsigned current_scene_ = 0;
     GLuint program_id;

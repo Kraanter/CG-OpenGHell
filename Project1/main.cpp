@@ -11,6 +11,8 @@
 #include "glsl.h"
 #include "objectScene.h"
 #include "sceneManager.h"
+#include "scenes/carScene.h"
+#include "scenes/trackScene.h"
 
 using namespace std;
 
@@ -60,21 +62,27 @@ void keyboardHandler(unsigned char key, int a, int b) {
     switch (key) {
     case 'w':
         scene->cameraPos.z -= 1.0f;
+        scene->centerPos.z -= 1.0f;
         break;
     case 's':
         scene->cameraPos.z += 1.0f;
+        scene->centerPos.z += 1.0f;
         break;
     case 'a':
         scene->cameraPos.x -= 1.0f;
+        scene->centerPos.x -= 1.0f;
         break;
     case 'd':
         scene->cameraPos.x += 1.0f;
+        scene->centerPos.x += 1.0f;
         break;
     case 'q':
         scene->cameraPos.y -= 1.0f;
+        scene->centerPos.y -= 1.0f;
         break;
     case 'e':
         scene->cameraPos.y += 1.0f;
+        scene->centerPos.y += 1.0f;
         break;
     case 'r':
         scene->centerPos.z -= 1.0f;
@@ -100,10 +108,13 @@ void keyboardHandler(unsigned char key, int a, int b) {
     case 'n':
         stage_manager.nextScene();
         break;
+    case '\\':
+        scene->resetAndInit();
+        break;
     }
 
     const int num = key - '0';
-    if (num >= 0 && scene->num_objects > num) { scene->objects[num].visible = !scene->objects[num].visible; }
+    if (num >= 0 && scene->getNumObjects() > num) { scene->objects[num].visible = !scene->objects[num].visible; }
 }
 
 
@@ -175,65 +186,24 @@ void InitShaders() {
 
 
 //------------------------------------------------------------
-// void InitMatrices()
-//------------------------------------------------------------
-
-void InitMatrices() {}
-
-
-//------------------------------------------------------------
 // void InitObjects()
 //------------------------------------------------------------
-
-
-Material* createMaterial() {
-    const auto material = new Material();
-    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
-    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
-    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
-    material->power = 50.0;
-    return material;
-}
-
-constexpr int COUNT = 1000;
-
-void InitObjects() {
-    objectScene scene;
-    for (int i = 0; i < COUNT; i++) {
-        object* obj = scene.addObject("Objects/Eigen/exports/track_curb.obj", "textures/track_curb_texture.bmp",
-                                      createMaterial());
-        obj->modelSpace.translate(glm::vec3(0.0, 0.0, i * 2.0 - COUNT));
-    }
-
-    scene.cameraPos = glm::vec3(0.0, 12.0, 100.0);
-
-    objectScene scene2;
-
-    scene2.addObject("Objects/Eigen/exports/auto_suv.obj", "textures/auto_texture_flip.bmp", createMaterial())->
-           modelSpace.translate(glm::vec3(1.0, 0.0, 0.0));
-    scene2.addObject("Objects/Eigen/exports/auto_suv.obj", "textures/uvtemplate.bmp", createMaterial())->
-           modelSpace.translate(glm::vec3(-1.0, 0.0, 0.0));
-
-    scene2.cameraPos = glm::vec3(0.0, 2.0, 6.0);
-
-    stage_manager.addScene(scene2);
-    stage_manager.addScene(scene);
+void InitScenes() {
+    stage_manager.addScene(new trackScene());
+    stage_manager.addScene(new carScene());
 }
 
 
 //------------------------------------------------------------
 // void InitMaterialsLight()
 //------------------------------------------------------------
-
 void InitMaterialsLight() { light.position = glm::vec3(4.0, 4.0, 4.0); }
 
 
 //------------------------------------------------------------
 // void InitBuffers()
 // Allocates and fills buffers
-//------------------------------------------------------------
-
-
+//------------------------------------------------------------ 
 void InitBuffers() {
     stage_manager.bindVBO(program_id);
 
@@ -244,12 +214,10 @@ void InitBuffers() {
     stage_manager.fillUniformVars(glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f), light.position);
 }
 
-
 int main(int argc, char** argv) {
     InitGlutGlew(argc, argv);
     InitShaders();
-    InitObjects();
-    InitMatrices();
+    InitScenes();
     InitMaterialsLight();
     InitBuffers();
 

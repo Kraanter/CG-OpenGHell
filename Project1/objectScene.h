@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <iostream>
 #include <vector>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -32,7 +33,6 @@ struct UniformVars {
     GLuint uniform_material_power;
 };
 
-
 class object {
 public:
     object(objectData data, Material* material);
@@ -49,18 +49,29 @@ public:
 
 class objectScene {
 public:
-    UniformVars* uniform_vars;
-    std::vector<object> objects;
-    unsigned int num_objects = 0;
+    unsigned getNumObjects() { return num_objects; }
 
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    glm::vec3 centerPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    virtual glm::vec3 startCameraPos() { return glm::vec3(1.0, 1.0, 0.0); }
+    virtual glm::vec3 startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
+
+    virtual void resetAndInit() {
+        cameraPos = startCameraPos();
+        centerPos = startCenterPos();
+        objects.clear();
+    }
+
+    glm::vec3 cameraPos = startCameraPos();
+    glm::vec3 centerPos = startCenterPos();
+    std::vector<object> objects = std::vector<object>();
 
     objectScene();
     object* addObject(const char* obj_path, const char* txt_path, Material* material);
     void render(glm::vec3 light_pos);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
+    Material* createMaterial();
 
 private:
+    unsigned num_objects = 0;
+    UniformVars* uniform_vars;
     glm::mat4 currentViewMat() { return lookAt(cameraPos, centerPos, glm::vec3(0.0, 1.0, 0.0)); }
 };

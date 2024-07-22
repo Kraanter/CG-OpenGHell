@@ -3,11 +3,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 sceneManager::sceneManager() {
-    scenes_ = std::vector<objectScene>();
+    scenes_ = std::vector<objectScene*>();
     uniform_vars = UniformVars();
 };
 
-void sceneManager::render(glm::vec3 light_pos) { scenes_[current_scene_].render(light_pos); }
+void sceneManager::render(glm::vec3 light_pos) { scenes_[current_scene_]->render(light_pos); }
 
 void sceneManager::bindVBO(GLuint program_id) {
     this->program_id = program_id;
@@ -22,7 +22,7 @@ void sceneManager::bindVBO(GLuint program_id) {
 
     // Set the uniform variables for all scenes
     for (auto& scene : scenes_)
-        scene.setUniformVars(&uniform_vars, program_id);
+        scene->setUniformVars(&uniform_vars, program_id);
 }
 
 void sceneManager::fillUniformVars(glm::mat4 projection, glm::vec3 light_pos) {
