@@ -56,14 +56,54 @@ sceneManager stage_manager;
 //--------------------------------------------------------------------------------
 
 void keyboardHandler(unsigned char key, int a, int b) {
-    if (key == 27)
+    objectScene* scene = stage_manager.currentScene();
+    switch (key) {
+    case 'w':
+        scene->cameraPos.z -= 1.0f;
+        break;
+    case 's':
+        scene->cameraPos.z += 1.0f;
+        break;
+    case 'a':
+        scene->cameraPos.x -= 1.0f;
+        break;
+    case 'd':
+        scene->cameraPos.x += 1.0f;
+        break;
+    case 'q':
+        scene->cameraPos.y -= 1.0f;
+        break;
+    case 'e':
+        scene->cameraPos.y += 1.0f;
+        break;
+    case 'r':
+        scene->centerPos.z -= 1.0f;
+        break;
+    case 'f':
+        scene->centerPos.z += 1.0f;
+        break;
+    case 't':
+        scene->centerPos.x -= 1.0f;
+        break;
+    case 'g':
+        scene->centerPos.x += 1.0f;
+        break;
+    case 'y':
+        scene->centerPos.y -= 1.0f;
+        break;
+    case 'h':
+        scene->centerPos.y += 1.0f;
+        break;
+    case 27:
         glutExit();
+        break;
+    case 'n':
+        stage_manager.nextScene();
+        break;
+    }
 
     const int num = key - '0';
-    objectScene* scene = stage_manager.currentScene();
     if (num >= 0 && scene->num_objects > num) { scene->objects[num].visible = !scene->objects[num].visible; }
-
-    if (key == 'n') { stage_manager.nextScene(); }
 }
 
 
