@@ -95,7 +95,7 @@ public:
     std::vector<object> objects = std::vector<object>();
 
     objectScene();
-    object* addObject(const char* obj_path, const char* txt_path, Material* material);
+    object* addObject(const char* obj_path, const char* txt_path, Material* material, bool visible = true);
     void render(glm::vec3 light_pos);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
     Material* createMaterial();

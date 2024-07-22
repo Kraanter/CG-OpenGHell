@@ -12,6 +12,9 @@ public:
 private:
     unsigned camRadius;
     unsigned camHeight;
-    float camPercentage = 0;
+    float camPercentage;
+    unsigned selectedCar;
+    void getAllCars();
+    std::vector<std::string> carFiles;
     glm::vec3 calcCameraPos();
 };

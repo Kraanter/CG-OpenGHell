@@ -2,6 +2,8 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+
+#include "../FileSys.h"
 #include "../glsl.h"
 
 glm::vec3 carScene::startCameraPos() { return calcCameraPos(); }
@@ -34,6 +36,16 @@ void carScene::keyboardHandler(unsigned char key) {
     case 'e':
         camHeight += HEIGHT_INCREMENT;
         break;
+    case '.':
+        objects[selectedCar + 1].visible = false;
+        selectedCar = (selectedCar + 1) % carFiles.size();
+        objects[selectedCar + 1].visible = true;
+        break;
+    case ',':
+        objects[selectedCar + 1].visible = false;
+        selectedCar = (selectedCar - 1) % carFiles.size();
+        objects[selectedCar + 1].visible = true;
+        break;
     default:
         return;
     }
@@ -47,16 +59,35 @@ glm::vec3 carScene::calcCameraPos() {
     return glm::vec3(x, camHeight, z);
 }
 
+void carScene::getAllCars() {
+    vector<string> carDirs = FileSys::getFilesInDir("objects/Asseto Corsa");
+
+    // Print all files in the directory
+    for (auto& file : carDirs) {
+        vector<string> dirContents = FileSys::getFilesInDir(file);
+        for (auto& dirContent : dirContents) {
+            if (dirContent.find(".obj") != string::npos) { carFiles.push_back(dirContent); }
+        }
+    }
+}
+
 void carScene::resetAndInit() {
+    selectedCar = 0;
     camRadius = 6;
     camHeight = 2;
     camPercentage = 0.25;
     cameraPos = startCameraPos();
     centerPos = startCenterPos();
     objects.clear();
+    getAllCars();
 
-    addObject("Objects/Eigen/exports/auto_suv.obj", "textures/auto_texture_flip.bmp", createMaterial())->
-        modelSpace.translate(glm::vec3(0.0, 0.147, 0.0));
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial())->
-        modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(glm::vec3(0.25));
+        modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25);
+
+    for (auto& carFile : carFiles) {
+        addObject(carFile.c_str(), "textures/uvtemplate_flip.bmp", createMaterial(), false)->
+            modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008);
+    }
+
+    objects[selectedCar + 1].visible = true;
 }

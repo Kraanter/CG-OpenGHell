@@ -68,9 +68,10 @@ objectScene::objectScene() {
 };
 
 
-object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material) {
+object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material, bool visible) {
     objectData data(obj_path, txt_path);
     object obj(data, material);
+    obj.visible = visible;
     objects.push_back(obj);
     num_objects++;
 

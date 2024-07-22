@@ -84,6 +84,7 @@
             <SDLCheck>true</SDLCheck>
             <ConformanceMode>true</ConformanceMode>
             <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <LanguageStandard>stdcpp17</LanguageStandard>
         </ClCompile>
         <Link>
             <SubSystem>Console</SubSystem>
@@ -134,6 +135,7 @@
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
+        <ClCompile Include="FileSys.cpp"/>
         <ClCompile Include="glsl.cpp"/>
         <ClCompile Include="main.cpp"/>
         <ClCompile Include="objectData.cpp"/>
@@ -145,6 +147,7 @@
         <ClCompile Include="texture.cpp"/>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="FileSys.h"/>
         <ClInclude Include="glsl.h"/>
         <ClInclude Include="objectData.h"/>
         <ClInclude Include="objectScene.h"/>
@@ -199,16 +202,6 @@
         <Content Include="objects\Asseto corsa\Chevrolet Camaro GT4R\3d.mtl"/>
         <Content Include="objects\Asseto corsa\Chevrolet Camaro GT4R\3d.obj"/>
         <Content Include="objects\Asseto corsa\Chevrolet Camaro GT4R\wire.png"/>
-        <Content Include="objects\Asseto corsa\Driver\gloves\GLOVES_AO.tga"/>
-        <Content Include="objects\Asseto corsa\Driver\gloves\wire.png"/>
-        <Content Include="objects\Asseto corsa\Driver\hans\HANS_AO.tga"/>
-        <Content Include="objects\Asseto corsa\Driver\hans\wire_hans.png"/>
-        <Content Include="objects\Asseto corsa\Driver\hans\wire_logos.png"/>
-        <Content Include="objects\Asseto corsa\Driver\helmet_sparco\HELMET_AO.tga"/>
-        <Content Include="objects\Asseto corsa\Driver\helmet_sparco\wire_glass.png"/>
-        <Content Include="objects\Asseto corsa\Driver\helmet_sparco\wire_helmet.png"/>
-        <Content Include="objects\Asseto corsa\Driver\suit\SUIT_AO.tga"/>
-        <Content Include="objects\Asseto corsa\Driver\suit\wire.png"/>
         <Content Include="objects\Asseto corsa\Ferrari 296 GT3\3d.obj"/>
         <Content Include="objects\Asseto corsa\Ferrari 296 GT3\wire.png"/>
         <Content Include="objects\Asseto corsa\Ferrari 488 Challenge Evo\3d.mtl"/>
@@ -220,84 +213,6 @@
         <Content Include="objects\Asseto corsa\Ferrari 488 GT3\3d.mtl"/>
         <Content Include="objects\Asseto corsa\Ferrari 488 GT3\3d.obj"/>
         <Content Include="objects\Asseto corsa\Ferrari 488 GT3\wire.png"/>
-        <Content Include="objects\Asseto corsa\Flags\Andorra23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Argentina23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Armenia23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Australia23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Austria23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\AZERBAIJAN23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\BELGIUM23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\blank.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Brasil23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Bulgaria23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\canada23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\China23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Colombia23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\croatia23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\cuba23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\CZECH_REPUBLIC23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\denmark23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\ESTONIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Finland23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\France23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\georgia23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\GERMANY23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Greece23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\HongKong23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Hungary23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\India23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\INDONESIAN23-01.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Ireland23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Israel23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\ITALY23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Jamaica23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Japan23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Korea23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Kuweit23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\LATVIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Lebanon23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\LITHUANIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Luxemburg23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\MACAU23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\MALAYSIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\MEXICO23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Monaco23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Nepal.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\NETHERLANDS23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\NewZealand23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\new_caledonia23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\nigeria23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\NorthernIreland23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\norway23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Oman23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Papua_New_Guinea_23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\philippines23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\POLAND23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\PORTUGAL23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\puerto_rico23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Qatar23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\ROMANIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\RUSSIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\SAN-MARINO23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\SAUDI_ARABIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Scotland23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Serbi23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\SINGAPORE23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\SLOVAKIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\SLOVENIA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\SouthAfrica23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\spain23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\sweden23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Switzerland23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Taiwan_23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Thailand23-01.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Turkey23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\UAE23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\UK23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Ukraine23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\USA23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Venezuela23.tga"/>
-        <Content Include="objects\Asseto corsa\Flags\Wales23.tga"/>
         <Content Include="objects\Asseto corsa\Ford Mustang GT3\3d.mtl"/>
         <Content Include="objects\Asseto corsa\Ford Mustang GT3\3d.obj"/>
         <Content Include="objects\Asseto corsa\Ford Mustang GT3\wire.png"/>
