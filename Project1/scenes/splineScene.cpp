@@ -14,16 +14,29 @@ void splineScene::keyboardHandler(unsigned char key) {
 }
 
 void splineScene::resetAndInit() {
+    // Set random seed to unix time
+    srand(time(nullptr));
+
     spline = CatmullRom();
 
     // Devide a circle in N equal parts and generate a random point in each part
-    int numCirlceParts = 10;
+    int minNumCirlceParts = 6;
+    int maxNumCirlceParts = 12;
+    int fullNum = 1000;
+    float curNum = 0.0f;
+    float minInc = fullNum / maxNumCirlceParts;
+    float maxInc = fullNum / minNumCirlceParts;
+    int modInc = maxInc - minInc;
+    float curInc = rand() % modInc + minInc;
+    curNum += curInc;
+    curInc += rand() % modInc + minInc;
+
     float radius = 5;
-    for (int i = 0; i < numCirlceParts; i++) {
-        float angle1 = static_cast<float>(i) / numCirlceParts * 2 * glm::pi<float>();
+    while (curNum < fullNum) {
+        float angle1 = curNum / fullNum * 2 * glm::pi<float>();
         float x1 = glm::cos(angle1) * radius;
         float y1 = glm::sin(angle1) * radius;
-        float angle2 = static_cast<float>(i + 1) / numCirlceParts * 2 * glm::pi<float>();
+        float angle2 = (curNum + curInc) / fullNum * 2 * glm::pi<float>();
         float x2 = glm::cos(angle2) * radius;
         float y2 = glm::sin(angle2) * radius;
 
@@ -34,8 +47,8 @@ void splineScene::resetAndInit() {
         // Distance between 1 and 2
         float d = glm::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 
-        // C is the center of a new circle with radius d / 2
-        float r = d / 2;
+        // C is the center of a new circle with radius
+        float r = d / 2.0f;
 
         // Calculate a random point on the circle
         float rangle = rand() / static_cast<float>(RAND_MAX) * 2 * glm::pi<float>();
@@ -43,6 +56,9 @@ void splineScene::resetAndInit() {
         float y = cy + r * glm::sin(rangle);
 
         spline.addPoint(glm::vec2(x, y));
+
+        curNum += curInc;
+        curInc = rand() % modInc + minInc;
     }
 
 
