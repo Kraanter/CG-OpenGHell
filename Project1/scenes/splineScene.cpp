@@ -19,7 +19,10 @@ void splineScene::resetAndInit() {
 
     spline = CatmullRom();
 
-    // Devide a circle in N equal parts and generate a random point in each part
+    // Desmos: https://www.desmos.com/calculator/qdk6xeflti
+    // This might help you understand the math behind the spline generation
+
+    // Devide a circle in different size parts and generate a random point on a circle the size of each part
     int minNumCirlceParts = 6;
     int maxNumCirlceParts = 12;
     int fullNum = 1000;
