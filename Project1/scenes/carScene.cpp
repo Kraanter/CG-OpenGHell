@@ -14,9 +14,9 @@ carScene::carScene() { carScene::resetAndInit(); }
 
 constexpr int RADIUS_INCREMENT = 1;
 constexpr int HEIGHT_INCREMENT = 1;
-constexpr float PERCENTAGE_INCREMENT = 0.02;
+constexpr float PERCENTAGE_INCREMENT = 0.02f;
 
-void carScene::keyboardHandler(unsigned char key) {
+void carScene::keyboardHandler(const unsigned char key) {
     switch (key) {
     case 'w':
         camRadius -= RADIUS_INCREMENT;
@@ -53,7 +53,7 @@ void carScene::keyboardHandler(unsigned char key) {
 }
 
 glm::vec3 carScene::calcCameraPos() {
-    float angle = camPercentage * 2 * M_PI;
+    float angle = camPercentage * 2.0f * M_PI;
     float x = camRadius * cos(angle);
     float z = camRadius * sin(angle);
     return glm::vec3(x, camHeight, z);
@@ -82,12 +82,15 @@ void carScene::resetAndInit() {
     getAllCars();
 
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial())->
-        modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25);
+        modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25f);
 
-    for (auto& carFile : carFiles) {
-        addObject(carFile.c_str(), "textures/uvtemplate_flip.bmp", createMaterial(), false)->
-            modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008);
-    }
+    // Add all cars
+    for (auto& car : carFiles) { addCar(car.c_str()); }
 
     objects[selectedCar + 1].visible = true;
+}
+
+void carScene::addCar(const char* car_path) {
+    addObject(car_path, "textures/uvtemplate_flip.bmp", createMaterial(), false)->
+        modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008f);
 }

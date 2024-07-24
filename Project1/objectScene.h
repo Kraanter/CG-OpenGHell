@@ -55,32 +55,33 @@ public:
     virtual glm::vec3 startCameraPos() { return glm::vec3(1.0, 1.0, 0.0); }
     virtual glm::vec3 startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
 
-    virtual void keyboardHandler(unsigned char key) {
+    virtual void keyboardHandler(const unsigned char key) {
         switch (key) {
         case 'w':
-            cameraPos.z -= 0.1;
-            centerPos.z -= 0.1;
+            cameraPos.z -= 0.1f;
+            centerPos.z -= 0.1f;
             break;
         case 's':
-            cameraPos.z += 0.1;
-            centerPos.z += 0.1;
+            cameraPos.z += 0.1f;
+            centerPos.z += 0.1f;
             break;
         case 'a':
-            cameraPos.x -= 0.1;
-            centerPos.x -= 0.1;
+            cameraPos.x -= 0.1f;
+            centerPos.x -= 0.1f;
             break;
         case 'd':
-            cameraPos.x += 0.1;
-            centerPos.x += 0.1;
+            cameraPos.x += 0.1f;
+            centerPos.x += 0.1f;
             break;
         case 'q':
-            cameraPos.y -= 0.1;
-            centerPos.y -= 0.1;
+            cameraPos.y -= 0.1f;
+            centerPos.y -= 0.1f;
             break;
         case 'e':
-            cameraPos.y += 0.1;
-            centerPos.y += 0.1;
+            cameraPos.y += 0.1f;
+            centerPos.y += 0.1f;
             break;
+        default: ;
         }
     }
 
@@ -96,6 +97,7 @@ public:
 
     objectScene();
     object* addObject(const char* obj_path, const char* txt_path, Material* material, bool visible = true);
+    virtual void preRenderCallback(glm::vec3 light_pos) {}
     void render(glm::vec3 light_pos);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
     Material* createMaterial();

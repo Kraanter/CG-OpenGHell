@@ -35,7 +35,6 @@ object::object(objectData data, Material* material) : data(data), material(mater
 void object::bindVBO(GLuint program_id) { data.bindVBO(program_id); }
 
 void object::render(const UniformVars* uVars, const glm::mat4* view, glm::vec3 light_pos) {
-    // modelSpace.rotate(0.01f, glm::vec3(0.5f, 1.0f, 0.2f));
     glm::mat4 mv = *view * modelSpace.model;
     glBindTexture(GL_TEXTURE_2D, data.texture_id);
     glUniform3fv(uVars->uniform_material_ambient, 1, value_ptr(material->ambient_color));
@@ -80,6 +79,7 @@ object* objectScene::addObject(const char* obj_path, const char* txt_path, Mater
 
 
 void objectScene::render(glm::vec3 light_pos) {
+    preRenderCallback(light_pos);
     for (auto& obj : objects)
         if (obj.visible) {
             glm::mat4 curViewMat = currentViewMat();

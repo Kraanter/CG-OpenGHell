@@ -15,6 +15,7 @@ private:
     float camPercentage;
     unsigned selectedCar;
     void getAllCars();
+    void addCar(const char* car_path);
     std::vector<std::string> carFiles;
     glm::vec3 calcCameraPos();
 };
