@@ -12,6 +12,7 @@
 #include "objectScene.h"
 #include "sceneManager.h"
 #include "scenes/carScene.h"
+#include "scenes/splineScene.h"
 #include "scenes/trackScene.h"
 
 using namespace std;
@@ -147,8 +148,9 @@ void InitShaders() {
 // void InitObjects()
 //------------------------------------------------------------
 void InitScenes() {
-    stage_manager.addScene(new trackScene());
-    stage_manager.addScene(new carScene());
+    stage_manager.addScene(new splineScene());
+    // stage_manager.addScene(new trackScene());
+    // stage_manager.addScene(new carScene());
 }
 
 

@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <string>
+
 #include "../objectScene.h"
 
 class carScene : public objectScene {
