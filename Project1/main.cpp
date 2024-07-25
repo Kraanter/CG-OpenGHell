@@ -121,6 +121,13 @@ void InitGlutGlew(int argc, char** argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Hello OpenGL");
+    glutReshapeFunc([](int w, int h) {
+        glViewport(0, 0, w, h);
+
+        stage_manager.fillUniformVars(
+            glm::perspective(glm::radians(45.0f), static_cast<float>(w) / static_cast<float>(h), 0.1f, 1000.0f),
+            light.position);
+    });
     glutDisplayFunc(Render);
     glutKeyboardFunc(keyboardHandler);
     glutTimerFunc(DELTA_TIME, Render, 0);
