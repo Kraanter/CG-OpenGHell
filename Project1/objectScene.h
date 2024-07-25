@@ -1,9 +1,17 @@
 ﻿#pragma once
 
+#include <string>
 #include <vector>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "objectData.h"
+
+struct ApplicationData {
+    unsigned selectedCar;
+    std::vector<std::string> carFiles;
+
+    std::string getSelectedCarFile() { return carFiles[selectedCar]; }
+};
 
 struct Material {
     glm::vec3 ambient_color;
@@ -21,6 +29,13 @@ public:
     ModelSpace* rotate(float angle, glm::vec3 axis);
     ModelSpace* scale(glm::vec3 scale);
     ModelSpace* scale(float scale);
+
+    ModelSpace* setLocation(glm::vec3 location) {
+        auto locMat = glm::translate(glm::mat4(1.0f), location);
+        model[3] = locMat[3];
+        return this;
+    }
+
     void reset();
 };
 
@@ -97,14 +112,15 @@ public:
     glm::vec3 centerPos = startCenterPos();
     std::vector<object> objects = std::vector<object>();
 
-    objectScene();
+    objectScene(ApplicationData* appData);
     object* addObject(const char* obj_path, const char* txt_path, Material* material, bool visible = true);
     virtual void preRenderCallback(glm::vec3 light_pos) {}
     void render(glm::vec3 light_pos);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
     Material* createMaterial();
 
-private:
+protected:
+    ApplicationData* appData;
     unsigned num_objects = 0;
     UniformVars* uniform_vars;
     glm::mat4 currentViewMat() { return lookAt(cameraPos, centerPos, glm::vec3(0.0, 1.0, 0.0)); }

@@ -2,18 +2,20 @@
 
 #include <iostream>
 
-splineScene::splineScene() { resetAndInit(); }
+splineScene::splineScene(ApplicationData* application_data): objectScene(application_data) {
+    splineScene::resetAndInit();
+}
 
-glm::vec3 splineScene::startCameraPos() { return glm::vec3(6, 6, 0); }
+glm::vec3 splineScene::startCameraPos() { return glm::vec3(0.01, 1, 0); }
 glm::vec3 splineScene::startCenterPos() { return glm::vec3(0, 0, 0); }
 
 void splineScene::keyboardHandler(unsigned char key) {
     switch (key) {
     case 'e':
-        cameraPos.y += 1;
+        cameraPos.y += 0.1;
         break;
     case 'q':
-        cameraPos.y -= 1;
+        cameraPos.y -= 0.1;
         break;
     default:
         objectScene::keyboardHandler(key);
@@ -21,21 +23,50 @@ void splineScene::keyboardHandler(unsigned char key) {
     }
 }
 
+glm::vec3 splineScene::currentTrackPos() {
+    auto p = trackSpline.getPoint(trackCompletion);
+    return glm::vec3(p.x, 0, p.y);
+}
+
+glm::vec2 splineScene::currentTrackDir() {
+    auto p = trackSpline.getDerivative(trackCompletion);
+    return glm::vec2(p.x, p.y);
+}
+
+void splineScene::updateTrackCompletion() {
+    trackCompletion += 0.001f;
+    if (trackCompletion > 1.0f) { trackCompletion = 0.0f; }
+}
+
+void splineScene::preRenderCallback(glm::vec3 light_pos) {
+    updateTrackCompletion();
+
+    centerPos = currentTrackPos();
+
+    if (car != nullptr) {
+        auto dir = currentTrackPos();
+
+        car->modelSpace.setLocation(dir);
+    }
+}
+
 void splineScene::resetAndInit() {
     cameraPos = startCameraPos();
     centerPos = startCenterPos();
-    // Set random seed to unix time
-    trackSpline = generateTrackSpline();
-
     objects.clear();
+
+    trackSpline = generateTrackSpline();
     compileTrack();
+
+    car = addObject(appData->getSelectedCarFile().c_str(), "textures/uvtemplate.bmp", createMaterial(), true);
+    car->modelSpace.scale(0.0001f);
 }
 
 #define TRACKWIDTH 0.03f
 
 void splineScene::compileTrack() {
     // Create a track from the spline
-    constexpr int numPoints = 500;
+    constexpr int numPoints = 5000;
     auto first = trackSpline.getPoint(1.0f / numPoints);
     glm::vec2 last = first;
 
@@ -64,7 +95,7 @@ void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
     auto p6 = p1 - crossDir * TRACKWIDTH;
 
     auto data = objectData();
-    data.setTexture("textures/uvtemplate.bmp");
+    data.setTexture("textures/track.bmp");
     data.vertices = {
         // 6 points to create 2 triangles to create a quad p3-p4-p5-p6
         glm::vec3(p3.x, 0.0f, p3.y),
@@ -93,6 +124,7 @@ void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
     };
     auto obj = object(data, new Material());
     objects.push_back(obj);
+    num_objects++;
 }
 
 CatmullRom splineScene::generateTrackSpline() {

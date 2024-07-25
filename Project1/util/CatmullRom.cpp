@@ -32,6 +32,12 @@ void CatmullRom::removePoint(int index) {
 
 int CatmullRom::getNumPoints() { return numPoints; }
 
+glm::vec2 CatmullRom::getDerivative(float t) {
+    int bezierIndex = t * numPoints;
+    float localT = t * numPoints - bezierIndex;
+    return getTangent(localT, bezierIndex);
+}
+
 void CatmullRom::setTension(float t) { tension = t; }
 
 glm::vec2 CatmullRom::getPoint(float t) {

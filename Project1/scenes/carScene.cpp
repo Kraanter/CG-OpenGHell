@@ -10,7 +10,7 @@ glm::vec3 carScene::startCameraPos() { return calcCameraPos(); }
 
 glm::vec3 carScene::startCenterPos() { return glm::vec3(0.0f, 0.0f, 0.0f); }
 
-carScene::carScene() { carScene::resetAndInit(); }
+carScene::carScene(ApplicationData* app_data): objectScene(app_data) { carScene::resetAndInit(); }
 
 constexpr int RADIUS_INCREMENT = 1;
 constexpr int HEIGHT_INCREMENT = 1;
@@ -37,14 +37,14 @@ void carScene::keyboardHandler(const unsigned char key) {
         camHeight += HEIGHT_INCREMENT;
         break;
     case '.':
-        objects[selectedCar + 1].visible = false;
-        selectedCar = (selectedCar + 1) % carFiles.size();
-        objects[selectedCar + 1].visible = true;
+        objects[selectedCarId() + 1].visible = false;
+        appData->selectedCar = (selectedCarId() + 1) % appData->carFiles.size();
+        objects[selectedCarId() + 1].visible = true;
         break;
     case ',':
-        objects[selectedCar + 1].visible = false;
-        selectedCar = (selectedCar - 1) % carFiles.size();
-        objects[selectedCar + 1].visible = true;
+        objects[selectedCarId() + 1].visible = false;
+        appData->selectedCar = (selectedCarId() - 1) % appData->carFiles.size();
+        objects[selectedCarId() + 1].visible = true;
         break;
     default:
         return;
@@ -66,13 +66,13 @@ void carScene::getAllCars() {
     for (auto& file : carDirs) {
         vector<string> dirContents = FileSys::getFilesInDir(file);
         for (auto& dirContent : dirContents) {
-            if (dirContent.find(".obj") != string::npos) { carFiles.push_back(dirContent); }
+            if (dirContent.find(".obj") != string::npos) { appData->carFiles.push_back(dirContent); }
         }
     }
 }
 
 void carScene::resetAndInit() {
-    selectedCar = 0;
+    appData->selectedCar = 0;
     camRadius = 6;
     camHeight = 2;
     camPercentage = 0.25;
@@ -85,9 +85,9 @@ void carScene::resetAndInit() {
         modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25f);
 
     // Add all cars
-    for (auto& car : carFiles) { addCar(car.c_str()); }
+    for (auto& car : appData->carFiles) { addCar(car.c_str()); }
 
-    objects[selectedCar + 1].visible = true;
+    objects[selectedCarId() + 1].visible = true;
 }
 
 void carScene::addCar(const char* car_path) {

@@ -63,11 +63,9 @@ void objectScene::clearVBO() {
         glDeleteVertexArrays(1, &obj.data.vao);
 }
 
-objectScene::objectScene() {
+objectScene::objectScene(ApplicationData* app_data) : appData(app_data) {
     std::cout << "objectScene constructor\n";
-    cameraPos = startCameraPos();
-    centerPos = startCenterPos();
-    resetAndInit();
+    objectScene::resetAndInit();
 };
 
 
