@@ -11,5 +11,6 @@ public:
     splineScene();
 
 private:
-    CatmullRom spline;
+    CatmullRom trackSpline;
+    CatmullRom generateTrackSpline();
 };

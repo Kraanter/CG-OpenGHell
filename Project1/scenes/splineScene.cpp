@@ -17,8 +17,11 @@ void splineScene::resetAndInit() {
     // Set random seed to unix time
     srand(time(nullptr));
 
-    spline = CatmullRom();
+    trackSpline = generateTrackSpline();
+}
 
+CatmullRom splineScene::generateTrackSpline() {
+    auto spline = CatmullRom();
     // Desmos: https://www.desmos.com/calculator/qdk6xeflti
     // This might help you understand the math behind the spline generation
 
@@ -82,4 +85,6 @@ void splineScene::resetAndInit() {
         std::cout << "(" << p.x << ", " << p.y << ")";
         if (i < numControlPoints - 1) { std::cout << ","; }
     }
+
+    return spline;
 }
