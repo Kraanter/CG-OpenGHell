@@ -104,6 +104,7 @@ public:
         cameraPos = startCameraPos();
         centerPos = startCenterPos();
         objects.clear();
+        num_objects = 0;
     }
 
     void clearVBO();

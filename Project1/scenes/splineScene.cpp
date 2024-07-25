@@ -51,9 +51,9 @@ void splineScene::preRenderCallback(glm::vec3 light_pos) {
 }
 
 void splineScene::resetAndInit() {
+    objectScene::resetAndInit();
     cameraPos = startCameraPos();
     centerPos = startCenterPos();
-    objects.clear();
 
     trackSpline = generateTrackSpline();
     compileTrack();
