@@ -4,7 +4,7 @@
 
 splineScene::splineScene() { resetAndInit(); }
 
-glm::vec3 splineScene::startCameraPos() { return glm::vec3(0, 6, 0.0001); }
+glm::vec3 splineScene::startCameraPos() { return glm::vec3(6, 6, 0); }
 glm::vec3 splineScene::startCenterPos() { return glm::vec3(0, 0, 0); }
 
 void splineScene::keyboardHandler(unsigned char key) {
@@ -36,18 +36,14 @@ void splineScene::resetAndInit() {
 void splineScene::compileTrack() {
     // Create a track from the spline
     constexpr int numPoints = 500;
-    auto first = trackSpline.getPoint(0);
-    auto last = trackSpline.getPoint(1);
-
-    std::cout << "First: " << first.x << ", " << first.y << std::endl;
-    std::cout << "Last: " << last.x << ", " << last.y << std::endl;
+    auto first = trackSpline.getPoint(1.0f / numPoints);
+    glm::vec2 last = first;
 
     for (float i = 0; i < numPoints - 1; i += 1.0f) {
         float t1 = i / (numPoints - 1.0f);
-        float t2 = (i + 1) / (numPoints - 1.0f);
         glm::vec2 p1 = trackSpline.getPoint(t1);
-        glm::vec2 p2 = trackSpline.getPoint(t2);
-        createTrackPart(p1, p2);
+        createTrackPart(p1, last);
+        last = p1;
     }
 
     createTrackPart(last, first);
