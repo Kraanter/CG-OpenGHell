@@ -58,20 +58,20 @@ public:
     virtual void keyboardHandler(const unsigned char key) {
         switch (key) {
         case 'w':
-            cameraPos.z -= 0.1f;
-            centerPos.z -= 0.1f;
-            break;
-        case 's':
-            cameraPos.z += 0.1f;
-            centerPos.z += 0.1f;
-            break;
-        case 'a':
             cameraPos.x -= 0.1f;
             centerPos.x -= 0.1f;
             break;
-        case 'd':
+        case 's':
             cameraPos.x += 0.1f;
             centerPos.x += 0.1f;
+            break;
+        case 'd':
+            cameraPos.z -= 0.1f;
+            centerPos.z -= 0.1f;
+            break;
+        case 'a':
+            cameraPos.z += 0.1f;
+            centerPos.z += 0.1f;
             break;
         case 'q':
             cameraPos.y -= 0.1f;
@@ -90,6 +90,8 @@ public:
         centerPos = startCenterPos();
         objects.clear();
     }
+
+    void clearVBO();
 
     glm::vec3 cameraPos = startCameraPos();
     glm::vec3 centerPos = startCenterPos();

@@ -16,4 +16,5 @@ public:
     objectData();
     explicit objectData(const char* obj_path, const char* txt_path);
     void bindVBO(GLuint program_id);
+    void setTexture(const char* txt_path);
 };

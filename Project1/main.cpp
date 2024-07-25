@@ -27,6 +27,8 @@ constexpr constexpr int WIDTH = 800, HEIGHT = 800;
 const char* fragshader_name = "fragmentshader.frag";
 const char* vertexshader_name = "vertexshader.vert";
 
+const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f);
+
 constexpr unsigned int DELTA_TIME = 10;
 
 //--------------------------------------------------------------------------------
@@ -68,7 +70,9 @@ void keyboardHandler(unsigned char key, int a, int b) {
         stage_manager.nextScene();
         break;
     case 'r':
+        stage_manager.clearVBO();
         scene->resetAndInit();
+        stage_manager.bindVBO(program_id);
         break;
     default:
         if (scene != nullptr) { scene->keyboardHandler(key); }
@@ -149,7 +153,7 @@ void InitShaders() {
 //------------------------------------------------------------
 void InitScenes() {
     stage_manager.addScene(new splineScene());
-    // stage_manager.addScene(new trackScene());
+    stage_manager.addScene(new trackScene());
     // stage_manager.addScene(new carScene());
 }
 
@@ -171,10 +175,11 @@ void InitBuffers() {
     glUseProgram(program_id);
 
     // Fill uniform vars
-    stage_manager.fillUniformVars(glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f), light.position);
+    stage_manager.fillUniformVars(startProjection, light.position);
 }
 
 int main(int argc, char** argv) {
+    srand(time(nullptr));
     InitGlutGlew(argc, argv);
     InitShaders();
     InitScenes();

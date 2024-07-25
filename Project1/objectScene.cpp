@@ -49,14 +49,18 @@ void object::render(const UniformVars* uVars, const glm::mat4* view, glm::vec3 l
 }
 
 void object::debugPrint() {
-    // print this->data.uvs, this->data.normals, this->data.vertices
     std::cout << "UVs:\n";
-    std::cout << data.uvs.size() << '\n';
-    for (auto& uv : data.uvs) { std::cout << uv.x << ' ' << uv.y << '\n'; }
-    // std::cout << "Normals:\n";
-    // for (auto& normal : data.normals) { std::cout << normal.x << ' ' << normal.y << ' ' << normal.z << '\n'; }
-    // std::cout << "Vertices:\n";
-    // for (auto& vertex : data.vertices) { std::cout << vertex.x << ' ' << vertex.y << ' ' << vertex.z << '\n'; }
+    for (auto& uv : data.uvs) { std::cout << '(' << uv.x << ", " << uv.y << ')'; }
+    std::cout << "\nNormals:\n";
+    for (auto& normal : data.normals) { std::cout << '(' << normal.x << ", " << normal.y << ", " << normal.z << ')'; }
+    std::cout << "\nVertices:\n";
+    for (auto& vertex : data.vertices) { std::cout << '(' << vertex.x << ", " << vertex.y << ", " << vertex.z << ')'; }
+    std::cout << '\n';
+}
+
+void objectScene::clearVBO() {
+    for (auto& obj : objects)
+        glDeleteVertexArrays(1, &obj.data.vao);
 }
 
 objectScene::objectScene() {

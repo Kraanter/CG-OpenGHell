@@ -4,20 +4,99 @@
 
 splineScene::splineScene() { resetAndInit(); }
 
-glm::vec3 splineScene::startCameraPos() { return glm::vec3(0, 0, 10); }
+glm::vec3 splineScene::startCameraPos() { return glm::vec3(0, 6, 0.0001); }
+glm::vec3 splineScene::startCenterPos() { return glm::vec3(0, 0, 0); }
 
 void splineScene::keyboardHandler(unsigned char key) {
     switch (key) {
+    case 'e':
+        cameraPos.y += 1;
+        break;
+    case 'q':
+        cameraPos.y -= 1;
+        break;
     default:
+        objectScene::keyboardHandler(key);
         break;
     }
 }
 
 void splineScene::resetAndInit() {
+    cameraPos = startCameraPos();
+    centerPos = startCenterPos();
     // Set random seed to unix time
-    srand(time(nullptr));
-
     trackSpline = generateTrackSpline();
+
+    objects.clear();
+    compileTrack();
+}
+
+#define TRACKWIDTH 0.03f
+
+void splineScene::compileTrack() {
+    // Create a track from the spline
+    constexpr int numPoints = 500;
+    auto first = trackSpline.getPoint(0);
+    auto last = trackSpline.getPoint(1);
+
+    std::cout << "First: " << first.x << ", " << first.y << std::endl;
+    std::cout << "Last: " << last.x << ", " << last.y << std::endl;
+
+    for (float i = 0; i < numPoints - 1; i += 1.0f) {
+        float t1 = i / (numPoints - 1.0f);
+        float t2 = (i + 1) / (numPoints - 1.0f);
+        glm::vec2 p1 = trackSpline.getPoint(t1);
+        glm::vec2 p2 = trackSpline.getPoint(t2);
+        createTrackPart(p1, p2);
+    }
+
+    createTrackPart(last, first);
+}
+
+void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
+    glm::vec2 dir = normalize(p2 - p1);
+    float angle = glm::atan(dir.y, dir.x);
+    float length = glm::length(p2 - p1);
+
+    auto dir3d = glm::vec3(dir.x, dir.y, 0.0f);
+    auto crossDir3d = normalize(cross(dir3d, glm::vec3(0.0f, 0.0f, 1.0f)));
+    auto crossDir = glm::vec2(crossDir3d.x, crossDir3d.y);
+
+    auto p3 = p1 + crossDir * TRACKWIDTH;
+    auto p4 = p2 + crossDir * TRACKWIDTH;
+    auto p5 = p2 - crossDir * TRACKWIDTH;
+    auto p6 = p1 - crossDir * TRACKWIDTH;
+
+    auto data = objectData();
+    data.setTexture("textures/uvtemplate.bmp");
+    data.vertices = {
+        // 6 points to create 2 triangles to create a quad p3-p4-p5-p6
+        glm::vec3(p3.x, 0.0f, p3.y),
+        glm::vec3(p4.x, 0.0f, p4.y),
+        glm::vec3(p5.x, 0.0f, p5.y),
+        glm::vec3(p3.x, 0.0f, p3.y),
+        glm::vec3(p5.x, 0.0f, p5.y),
+        glm::vec3(p6.x, 0.0f, p6.y),
+
+    };
+    data.uvs = {
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(1.0f, 0.0f),
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(0.0f, 1.0f),
+    };
+    data.normals = {
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)
+    };
+    auto obj = object(data, new Material());
+    objects.push_back(obj);
 }
 
 CatmullRom splineScene::generateTrackSpline() {
@@ -37,7 +116,7 @@ CatmullRom splineScene::generateTrackSpline() {
     curNum += curInc;
     curInc += rand() % modInc + minInc;
 
-    float radius = 5;
+    float radius = 1;
     while (curNum < fullNum) {
         float angle1 = curNum / fullNum * 2 * glm::pi<float>();
         float x1 = glm::cos(angle1) * radius;
@@ -54,7 +133,7 @@ CatmullRom splineScene::generateTrackSpline() {
         float d = glm::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 
         // C is the center of a new circle with radius
-        float r = d / 2.0f;
+        float r = d / 1.0f;
 
         // Calculate a random point on the circle
         float rangle = rand() / static_cast<float>(RAND_MAX) * 2 * glm::pi<float>();
@@ -65,25 +144,6 @@ CatmullRom splineScene::generateTrackSpline() {
 
         curNum += curInc;
         curInc = rand() % modInc + minInc;
-    }
-
-
-    // Print a list of points
-    int numPoints = 250;
-    for (int i = 0; i < numPoints - 1; i++) {
-        float t = static_cast<float>(i) / (numPoints - 1.0f);
-        glm::vec2 p = spline.getPoint(t);
-        std::cout << "(" << p.x << ", " << p.y << ")";
-        if (i < numPoints - 2) { std::cout << ","; }
-    }
-    std::cout << std::endl;
-
-    // Print list of all spline control points
-    int numControlPoints = spline.getNumPoints();
-    for (int i = 0; i < numControlPoints; i++) {
-        glm::vec2 p = spline.getPoint(static_cast<float>(i) / numControlPoints);
-        std::cout << "(" << p.x << ", " << p.y << ")";
-        if (i < numControlPoints - 1) { std::cout << ","; }
     }
 
     return spline;

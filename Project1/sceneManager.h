@@ -23,6 +23,7 @@ public:
 
     void fillUniformVars(glm::mat4 projection, glm::vec3 light_pos);
     void bindVBO(GLuint program_id);
+    void clearVBO();
 
     sceneManager();
     std::vector<objectScene*> scenes_;

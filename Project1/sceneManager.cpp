@@ -25,6 +25,11 @@ void sceneManager::bindVBO(GLuint program_id) {
         scene->setUniformVars(&uniform_vars, program_id);
 }
 
+void sceneManager::clearVBO() {
+    for (auto& scene : scenes_)
+        scene->clearVBO();
+}
+
 void sceneManager::fillUniformVars(glm::mat4 projection, glm::vec3 light_pos) {
     glUniformMatrix4fv(uniform_vars.uniform_proj, 1, GL_FALSE, value_ptr(projection));
     glUniform3fv(uniform_vars.uniform_light_pos, 1, value_ptr(light_pos));

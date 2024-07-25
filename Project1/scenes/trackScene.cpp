@@ -1,6 +1,6 @@
 ﻿#include "trackScene.h"
 
-constexpr unsigned int COUNT = 1000;
+constexpr unsigned int COUNT = 2000;
 
 void trackScene::resetAndInit() {
     cameraPos = startCameraPos();
@@ -14,7 +14,7 @@ void trackScene::resetAndInit() {
     }
 }
 
-glm::vec3 trackScene::startCameraPos() { return glm::vec3(0.0, 12.0, 100.0); }
+glm::vec3 trackScene::startCameraPos() { return glm::vec3(0.0, 10.0, 50.0); }
 glm::vec3 trackScene::startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
 
 trackScene::trackScene() { trackScene::resetAndInit(); }
