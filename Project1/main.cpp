@@ -31,7 +31,7 @@ const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1
 
 constexpr unsigned int DELTA_TIME = 10;
 
-ApplicationData app_data = ApplicationData{0, vector<string>{"objects/Asseto corsa/Audi R8 GT4/3d.obj"}};
+ApplicationData app_data = ApplicationData{0, vector<string>(), 0};
 
 //--------------------------------------------------------------------------------
 // Typedefs
@@ -161,9 +161,9 @@ void InitShaders() {
 // void InitObjects()
 //------------------------------------------------------------
 void InitScenes() {
-    // stage_manager.addScene(new carScene(&app_data));
+    stage_manager.addScene(new carScene(&app_data));
     stage_manager.addScene(new splineScene(&app_data));
-    // stage_manager.addScene(new trackScene(&app_data));
+    stage_manager.addScene(new trackScene(&app_data));
 }
 
 

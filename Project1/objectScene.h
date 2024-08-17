@@ -9,6 +9,7 @@
 struct ApplicationData {
     unsigned selectedCar;
     std::vector<std::string> carFiles;
+    GLuint program_id;
 
     std::string getSelectedCarFile() { return carFiles[selectedCar]; }
 };
@@ -115,6 +116,7 @@ public:
 
     objectScene(ApplicationData* appData);
     object* addObject(const char* obj_path, const char* txt_path, Material* material, bool visible = true);
+    object* addObject(objectData data, Material* material, bool visible = true);
     virtual void preRenderCallback(glm::vec3 light_pos) {}
     void render(glm::vec3 light_pos);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);

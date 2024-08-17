@@ -19,6 +19,7 @@ constexpr float PERCENTAGE_INCREMENT = 0.02f;
 void carScene::keyboardHandler(const unsigned char key) {
     switch (key) {
     case 'w':
+        if (camRadius - RADIUS_INCREMENT <= 0) { return; }
         camRadius -= RADIUS_INCREMENT;
         break;
     case 's':
@@ -31,20 +32,17 @@ void carScene::keyboardHandler(const unsigned char key) {
         camPercentage += PERCENTAGE_INCREMENT;
         break;
     case 'q':
+        if (camHeight - HEIGHT_INCREMENT <= 0) { return; }
         camHeight -= HEIGHT_INCREMENT;
         break;
     case 'e':
         camHeight += HEIGHT_INCREMENT;
         break;
     case '.':
-        objects[selectedCarId() + 1].visible = false;
-        appData->selectedCar = (selectedCarId() + 1) % appData->carFiles.size();
-        objects[selectedCarId() + 1].visible = true;
+        reloadScene();
         break;
     case ',':
-        objects[selectedCarId() + 1].visible = false;
-        appData->selectedCar = (selectedCarId() - 1) % appData->carFiles.size();
-        objects[selectedCarId() + 1].visible = true;
+        reloadScene();
         break;
     default:
         return;
@@ -72,25 +70,33 @@ void carScene::getAllCars() {
 }
 
 void carScene::resetAndInit() {
+    objectScene::resetAndInit();
     appData->selectedCar = 0;
     camRadius = 6;
     camHeight = 2;
     camPercentage = 0.25;
     cameraPos = startCameraPos();
     centerPos = startCenterPos();
-    objects.clear();
     getAllCars();
 
+    initScene();
+}
+
+void carScene::initScene() {
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial())->
         modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25f);
 
-    // Add all cars
-    for (auto& car : appData->carFiles) { addCar(car.c_str()); }
-
-    objects[selectedCarId() + 1].visible = true;
+    car = addCar(selectedCar().c_str());
 }
 
-void carScene::addCar(const char* car_path) {
-    addObject(car_path, "textures/uvtemplate_flip.bmp", createMaterial(), false)->
-        modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008f);
+void carScene::reloadScene() {
+    clearVBO();
+    resetAndInit();
+    for (auto& obj : objects) { obj.bindVBO(appData->program_id); }
+}
+
+object* carScene::addCar(const char* car_path) {
+    auto addedCar = addObject(car_path, "textures/uvtemplate.bmp", createMaterial(), true);
+    addedCar->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008f);
+    return addedCar;
 }

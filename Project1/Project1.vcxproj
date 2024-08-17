@@ -300,6 +300,8 @@
         <Content Include="objects\Eigen\Blender\track_curb.blend1"/>
         <Content Include="objects\Eigen\Exports\auto_suv.mtl"/>
         <Content Include="objects\Eigen\Exports\auto_suv.obj"/>
+        <Content Include="objects\Eigen\Exports\osso.mtl"/>
+        <Content Include="objects\Eigen\Exports\osso.obj"/>
         <Content Include="objects\Eigen\Exports\plateau.mtl"/>
         <Content Include="objects\Eigen\Exports\plateau.obj"/>
         <Content Include="objects\Eigen\Exports\track_curb.mtl"/>
@@ -309,6 +311,8 @@
         <Content Include="objects\torus.obj"/>
         <Content Include="textures\auto_texture.bmp"/>
         <Content Include="textures\auto_texture_flip.bmp"/>
+        <Content Include="textures\colormap.bmp"/>
+        <Content Include="textures\colormap_flip.bmp"/>
         <Content Include="textures\Shrek.bmp"/>
         <Content Include="textures\track_curb_texture.bmp"/>
         <Content Include="textures\uvmap.DDS"/>

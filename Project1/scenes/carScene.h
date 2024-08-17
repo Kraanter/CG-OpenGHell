@@ -14,11 +14,14 @@ public:
     unsigned selectedCarId() { return appData->selectedCar; }
 
 private:
+    void initScene();
+    void reloadScene();
     std::string selectedCar() { return appData->carFiles[appData->selectedCar]; }
     unsigned camRadius;
     unsigned camHeight;
     float camPercentage;
+    object* car;
     void getAllCars();
-    void addCar(const char* car_path);
+    object* addCar(const char* car_path);
     glm::vec3 calcCameraPos();
 };

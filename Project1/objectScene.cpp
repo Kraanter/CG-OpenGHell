@@ -71,6 +71,11 @@ objectScene::objectScene(ApplicationData* app_data) : appData(app_data) {
 
 object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material, bool visible) {
     objectData data(obj_path, txt_path);
+
+    return addObject(data, material, visible);
+}
+
+object* objectScene::addObject(objectData data, Material* material, bool visible) {
     object obj(data, material);
     obj.visible = visible;
     objects.push_back(obj);
@@ -91,6 +96,7 @@ void objectScene::render(glm::vec3 light_pos) {
 
 void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program_id) {
     this->uniform_vars = uniform_vars;
+    appData->program_id = program_id;
 
     for (auto& obj : objects)
         obj.bindVBO(program_id);

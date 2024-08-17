@@ -31,11 +31,11 @@ void main()
     vec3 R = reflect(-L, N);
 
     // Compute the diffuse and specular components for each fragment
-//    vec3 diffuse = max(dot(N, L), 0.0) * mat_diffuse;
+    // vec3 diffuse = max(dot(N, L), 0.0) * mat_diffuse;
     vec3 diffuse = max(dot(N, L), 0.0) * texture(texsampler, UV).rgb;
-     vec3 specular = pow(max(dot(R, V), 0.0), mat_power) * mat_specular;
+    vec3 specular = pow(max(dot(R, V), 0.0), mat_power) * mat_specular;
 
     // Write final color to the framebuffer
     fragColor = vec4(mat_ambient + diffuse + specular, 1.0);
-//    fragColor = vec4(mat_ambient + diffuse, 1.0);
+    // fragColor = vec4(mat_ambient + diffuse, 1.0);
 }
