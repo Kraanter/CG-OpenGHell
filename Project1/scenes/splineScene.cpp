@@ -15,6 +15,7 @@ void splineScene::keyboardHandler(unsigned char key) {
         cameraPos.y += 0.1;
         break;
     case 'q':
+        if (cameraPos.y - 0.1 < 0) { return; }
         cameraPos.y -= 0.1;
         break;
     default:
@@ -41,12 +42,17 @@ void splineScene::updateTrackCompletion() {
 void splineScene::preRenderCallback(glm::vec3 light_pos) {
     updateTrackCompletion();
 
+    // Point the camera in the direction of the car
     centerPos = currentTrackPos();
 
     if (car != nullptr) {
         auto dir = currentTrackPos();
 
         car->modelSpace.setLocation(dir);
+
+        // Rotate the 0.1 radian
+        auto angle = glm::atan(dir.z, dir.x);
+        car->modelSpace.rotate(0.01, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 }
 
@@ -58,11 +64,11 @@ void splineScene::resetAndInit() {
     trackSpline = generateTrackSpline();
     compileTrack();
 
-    car = addObject(appData->getSelectedCarObj().c_str(), "textures/uvtemplate.bmp", createMaterial(), true);
-    car->modelSpace.scale(0.0001f);
+    car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(), createMaterial(), true);
+    car->modelSpace.scale(0.001f);
 }
 
-#define TRACKWIDTH 0.03f
+#define TRACKWIDTH 0.3f
 
 void splineScene::compileTrack() {
     // Create a track from the spline
@@ -144,7 +150,7 @@ CatmullRom splineScene::generateTrackSpline() {
     curNum += curInc;
     curInc += rand() % modInc + minInc;
 
-    float radius = 1;
+    float radius = 25;
     while (curNum < fullNum) {
         float angle1 = curNum / fullNum * 2 * glm::pi<float>();
         float x1 = glm::cos(angle1) * radius;
