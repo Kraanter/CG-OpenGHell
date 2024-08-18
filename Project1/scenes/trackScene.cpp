@@ -97,23 +97,10 @@ void trackScene::keyboardHandler(unsigned char key) {
     switch (key) {
     case 'q': break;
     case 'e': break;
-    // Pressing spacebar
     case ' ':
         if (cameraPos.y > 3.0f) { break; }
         upnertia = 1.0f;
         break;
-    // case 'i': centerPos += direction;
-    //     break;
-    // case 'k': centerPos -= direction;
-    //     break;
-    // case 'j': centerPos += direction;
-    //     break;
-    // case 'l': centerPos -= direction;
-    //     break;
-    // case 'o': centerPos.y += 1.0f;
-    //     break;
-    // case 'u': centerPos.y -= 1.0f;
-    //     break;
     case 'l':
         cameraRotationHor += 0.1f;
         centerPos = calcCenterPos();
