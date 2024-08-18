@@ -21,6 +21,9 @@ private:
     unsigned camRadius;
     unsigned camHeight;
     float camPercentage;
+    void nextCar();
+    void prevCar();
+    void reloadCar();
     object* car;
     void getAllCars();
     object* addCar(const char* car_path, const char* texture_path);

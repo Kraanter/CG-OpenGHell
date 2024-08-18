@@ -40,10 +40,10 @@ void carScene::keyboardHandler(const unsigned char key) {
         camHeight += HEIGHT_INCREMENT;
         break;
     case '.':
-        reloadScene();
+        nextCar();
         break;
     case ',':
-        reloadScene();
+        prevCar();
         break;
     default:
         return;
@@ -59,6 +59,8 @@ glm::vec3 carScene::calcCameraPos() {
 }
 
 void carScene::getAllCars() {
+    if (appData->carFiles.size() > 0) { return; }
+
     vector<string> carDirs = FileSys::getFilesInDir("objects/Asseto Corsa");
 
     // Print all files in the directory
@@ -77,7 +79,6 @@ void carScene::getAllCars() {
 
 void carScene::resetAndInit() {
     objectScene::resetAndInit();
-    appData->selectedCar = 0;
     camRadius = 6;
     camHeight = 2;
     camPercentage = 0.25;
@@ -93,6 +94,29 @@ void carScene::initScene() {
         modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25f);
 
     car = addCar(selectedCarObj().c_str(), selectedCarTxt().c_str());
+}
+
+void carScene::nextCar() {
+    appData->selectedCar++;
+    if (appData->selectedCar >= appData->carFiles.size()) { appData->selectedCar = 0; }
+
+    reloadCar();
+}
+
+void carScene::prevCar() {
+    if (appData->selectedCar == 0) { appData->selectedCar = appData->carFiles.size() - 1; }
+    else { appData->selectedCar--; }
+
+    reloadCar();
+}
+
+void carScene::reloadCar() {
+    objects.clear();
+    num_objects = 0;
+
+    clearVBO();
+    initScene();
+    for (auto& obj : objects) { obj.bindVBO(appData->program_id); }
 }
 
 void carScene::reloadScene() {
