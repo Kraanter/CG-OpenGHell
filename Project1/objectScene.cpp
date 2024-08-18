@@ -66,6 +66,7 @@ void objectScene::clearVBO() {
 objectScene::objectScene(ApplicationData* app_data) : appData(app_data) {
     std::cout << "objectScene constructor\n";
     objectScene::resetAndInit();
+    skyboxRef = new skybox(100);
 };
 
 
@@ -87,6 +88,8 @@ object* objectScene::addObject(objectData data, Material* material, bool visible
 
 void objectScene::render(glm::vec3 light_pos) {
     preRenderCallback(light_pos);
+    glm::mat4 view = currentViewMat();
+    skyboxRef->objectRef->render(uniform_vars, &view, light_pos);
     for (auto& obj : objects)
         if (obj.visible) {
             glm::mat4 curViewMat = currentViewMat();
@@ -103,6 +106,142 @@ void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program
 }
 
 Material* objectScene::createMaterial() {
+    const auto material = new Material();
+    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
+    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
+    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
+    material->power = 50.0;
+    return material;
+}
+
+object* skybox::createSkyboxData(int size) {
+    objectData data;
+    data.vertices = {
+        // Front face
+        glm::vec3(-size, -size, -size),
+        glm::vec3(-size, -size, size),
+        glm::vec3(-size, size, size),
+        glm::vec3(-size, -size, -size),
+        glm::vec3(-size, size, size),
+        glm::vec3(-size, size, -size),
+        // Right face
+        glm::vec3(size, -size, -size),
+        glm::vec3(size, -size, size),
+        glm::vec3(size, size, size),
+        glm::vec3(size, -size, -size),
+        glm::vec3(size, size, size),
+        glm::vec3(size, size, -size),
+        // Back face
+        glm::vec3(-size, -size, -size),
+        glm::vec3(-size, size, -size),
+        glm::vec3(size, size, -size),
+        glm::vec3(-size, -size, -size),
+        glm::vec3(size, size, -size),
+        glm::vec3(size, -size, -size),
+        // Left face
+        glm::vec3(-size, -size, size),
+        glm::vec3(-size, size, size),
+        glm::vec3(size, size, size),
+        glm::vec3(-size, -size, size),
+        glm::vec3(size, size, size),
+        glm::vec3(size, -size, size),
+        // Top face
+        glm::vec3(-size, size, -size),
+        glm::vec3(-size, size, size),
+        glm::vec3(size, size, size),
+        glm::vec3(-size, size, -size),
+        glm::vec3(size, size, size),
+        glm::vec3(size, size, -size),
+        // Bottom face
+        glm::vec3(-size, -size, -size),
+        glm::vec3(-size, -size, size),
+        glm::vec3(size, -size, size),
+        glm::vec3(-size, -size, -size),
+        glm::vec3(size, -size, size),
+        glm::vec3(size, -size, -size),
+    };
+    data.uvs = {
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+        glm::vec2(0.55, 0.55),
+    };
+    // Normals for the skybox are in the opposite direction of the faces
+    data.normals = {
+        glm::vec3(0.0, 0.0, 1.0),
+        glm::vec3(0.0, 0.0, 1.0),
+        glm::vec3(0.0, 0.0, 1.0),
+        glm::vec3(0.0, 0.0, 1.0),
+        glm::vec3(0.0, 0.0, 1.0),
+        glm::vec3(0.0, 0.0, 1.0),
+        glm::vec3(0.0, 0.0, -1.0),
+        glm::vec3(0.0, 0.0, -1.0),
+        glm::vec3(0.0, 0.0, -1.0),
+        glm::vec3(0.0, 0.0, -1.0),
+        glm::vec3(0.0, 0.0, -1.0),
+        glm::vec3(0.0, 0.0, -1.0),
+        glm::vec3(1.0, 0.0, 0.0),
+        glm::vec3(1.0, 0.0, 0.0),
+        glm::vec3(1.0, 0.0, 0.0),
+        glm::vec3(1.0, 0.0, 0.0),
+        glm::vec3(1.0, 0.0, 0.0),
+        glm::vec3(1.0, 0.0, 0.0),
+        glm::vec3(-1.0, 0.0, 0.0),
+        glm::vec3(-1.0, 0.0, 0.0),
+        glm::vec3(-1.0, 0.0, 0.0),
+        glm::vec3(-1.0, 0.0, 0.0),
+        glm::vec3(-1.0, 0.0, 0.0),
+        glm::vec3(-1.0, 0.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, -1.0, 0.0),
+        glm::vec3(0.0, -1.0, 0.0),
+        glm::vec3(0.0, -1.0, 0.0),
+        glm::vec3(0.0, -1.0, 0.0),
+        glm::vec3(0.0, -1.0, 0.0),
+        glm::vec3(0.0, -1.0, 0.0),
+    };
+
+    return new object(data, createMaterial());
+}
+
+Material* skybox::createMaterial() {
     const auto material = new Material();
     material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
     material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);

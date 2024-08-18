@@ -16,12 +16,13 @@ public:
 private:
     void initScene();
     void reloadScene();
-    std::string selectedCar() { return appData->carFiles[appData->selectedCar]; }
+    std::string selectedCarObj() { return appData->getSelectedCarObj(); }
+    std::string selectedCarTxt() { return appData->getSelectedCarTxt(); }
     unsigned camRadius;
     unsigned camHeight;
     float camPercentage;
     object* car;
     void getAllCars();
-    object* addCar(const char* car_path);
+    object* addCar(const char* car_path, const char* texture_path);
     glm::vec3 calcCameraPos();
 };

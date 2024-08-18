@@ -1,6 +1,7 @@
 ﻿#include "carScene.h"
 
 #define _USE_MATH_DEFINES
+#include <iostream>
 #include <math.h>
 
 #include "../FileSys.h"
@@ -63,9 +64,14 @@ void carScene::getAllCars() {
     // Print all files in the directory
     for (auto& file : carDirs) {
         vector<string> dirContents = FileSys::getFilesInDir(file);
+        string objFile = "";
+        string textureFile = "";
         for (auto& dirContent : dirContents) {
-            if (dirContent.find(".obj") != string::npos) { appData->carFiles.push_back(dirContent); }
+            if (dirContent.find(".obj") != string::npos) { objFile = dirContent; }
+            else if (dirContent.find(".bmp") != string::npos) { textureFile = dirContent; }
         }
+        std::cout << "Car: " << objFile << " Texture: " << textureFile << endl;
+        appData->carFiles.push_back({objFile, textureFile});
     }
 }
 
@@ -86,7 +92,7 @@ void carScene::initScene() {
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial())->
         modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25f);
 
-    car = addCar(selectedCar().c_str());
+    car = addCar(selectedCarObj().c_str(), selectedCarTxt().c_str());
 }
 
 void carScene::reloadScene() {
@@ -95,8 +101,8 @@ void carScene::reloadScene() {
     for (auto& obj : objects) { obj.bindVBO(appData->program_id); }
 }
 
-object* carScene::addCar(const char* car_path) {
-    auto addedCar = addObject(car_path, "textures/uvtemplate.bmp", createMaterial(), true);
+object* carScene::addCar(const char* car_path, const char* texture_path) {
+    auto addedCar = addObject(car_path, texture_path, createMaterial(), true);
     addedCar->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008f);
     return addedCar;
 }

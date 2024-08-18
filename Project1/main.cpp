@@ -22,7 +22,7 @@ using namespace std;
 // Consts
 //--------------------------------------------------------------------------------
 
-constexpr constexpr int WIDTH = 800, HEIGHT = 800;
+constexpr int WIDTH = 800, HEIGHT = 800;
 
 const char* fragshader_name = "fragmentshader.frag";
 const char* vertexshader_name = "vertexshader.vert";
@@ -31,7 +31,7 @@ const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1
 
 constexpr unsigned int DELTA_TIME = 10;
 
-ApplicationData app_data = ApplicationData{0, vector<string>(), 0};
+ApplicationData app_data = ApplicationData{0, vector<tuple<string, string>>(), 0};
 
 //--------------------------------------------------------------------------------
 // Typedefs

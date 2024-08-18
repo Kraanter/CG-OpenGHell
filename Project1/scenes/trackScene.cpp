@@ -45,6 +45,9 @@ void trackScene::resetAndInit() {
     object* ground = addGround();
     ground->modelSpace.scale(GROUND_SIZE);
 
+    object* tree = addObject("Objects/Eigen/exports/puntboom.obj", "textures/colormap_flip.bmp", createMaterial());
+    tree->modelSpace.translate(glm::vec3(10.0, 0.0, 5.0));
+
     object* house = addObject("Objects/Eigen/exports/osso.obj", "textures/colormap_flip.bmp", createMaterial());
     house->modelSpace.translate(glm::vec3(10.0, 0.0, 0.0))->rotate(glm::radians(90.0f), glm::vec3(0.0, -1.0, 0.0));
 

@@ -145,6 +145,7 @@
         <ClCompile Include="scenes\splineScene.cpp"/>
         <ClCompile Include="scenes\carScene.cpp"/>
         <ClCompile Include="scenes\trackScene.cpp"/>
+        <ClCompile Include="skybox.cpp"/>
         <ClCompile Include="texture.cpp"/>
         <ClCompile Include="util\CatmullRom.cpp"/>
     </ItemGroup>
@@ -158,6 +159,7 @@
         <ClInclude Include="scenes\splineScene.h"/>
         <ClInclude Include="scenes\carScene.h"/>
         <ClInclude Include="scenes\trackScene.h"/>
+        <ClInclude Include="skybox.h"/>
         <ClInclude Include="texture.h"/>
         <ClInclude Include="util\CatmullRom.h"/>
     </ItemGroup>
@@ -304,13 +306,13 @@
         <Content Include="objects\Eigen\Exports\osso.obj"/>
         <Content Include="objects\Eigen\Exports\plateau.mtl"/>
         <Content Include="objects\Eigen\Exports\plateau.obj"/>
+        <Content Include="objects\Eigen\Exports\puntboom.mtl"/>
+        <Content Include="objects\Eigen\Exports\puntboom.obj"/>
         <Content Include="objects\Eigen\Exports\track_curb.mtl"/>
         <Content Include="objects\Eigen\Exports\track_curb.obj"/>
         <Content Include="objects\sphere.obj"/>
         <Content Include="objects\teapot.obj"/>
         <Content Include="objects\torus.obj"/>
-        <Content Include="textures\auto_texture.bmp"/>
-        <Content Include="textures\auto_texture_flip.bmp"/>
         <Content Include="textures\colormap.bmp"/>
         <Content Include="textures\colormap_flip.bmp"/>
         <Content Include="textures\Shrek.bmp"/>

@@ -58,7 +58,7 @@ void splineScene::resetAndInit() {
     trackSpline = generateTrackSpline();
     compileTrack();
 
-    car = addObject(appData->getSelectedCarFile().c_str(), "textures/uvtemplate.bmp", createMaterial(), true);
+    car = addObject(appData->getSelectedCarObj().c_str(), "textures/uvtemplate.bmp", createMaterial(), true);
     car->modelSpace.scale(0.0001f);
 }
 

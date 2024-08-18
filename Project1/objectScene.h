@@ -5,13 +5,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "objectData.h"
+#include "skybox.h"
+
+struct UniformVars;
 
 struct ApplicationData {
     unsigned selectedCar;
-    std::vector<std::string> carFiles;
+    std::vector<std::tuple<std::string, std::string>> carFiles;
     GLuint program_id;
 
-    std::string getSelectedCarFile() { return carFiles[selectedCar]; }
+    std::string getSelectedCarObj() { return std::get<0>(carFiles[selectedCar]); }
+    std::string getSelectedCarTxt() { return std::get<1>(carFiles[selectedCar]); }
 };
 
 struct Material {
@@ -74,28 +78,28 @@ public:
     virtual void keyboardHandler(const unsigned char key) {
         switch (key) {
         case 'w':
-            cameraPos.x -= 0.1f;
-            centerPos.x -= 0.1f;
+            cameraPos.x -= 1.0f;
+            centerPos.x -= 1.0f;
             break;
         case 's':
-            cameraPos.x += 0.1f;
-            centerPos.x += 0.1f;
+            cameraPos.x += 1.0f;
+            centerPos.x += 1.0f;
             break;
         case 'd':
-            cameraPos.z -= 0.1f;
-            centerPos.z -= 0.1f;
+            cameraPos.z -= 1.0f;
+            centerPos.z -= 1.0f;
             break;
         case 'a':
-            cameraPos.z += 0.1f;
-            centerPos.z += 0.1f;
+            cameraPos.z += 1.0f;
+            centerPos.z += 1.0f;
             break;
         case 'q':
-            cameraPos.y -= 0.1f;
-            centerPos.y -= 0.1f;
+            cameraPos.y -= 1.0f;
+            centerPos.y -= 1.0f;
             break;
         case 'e':
-            cameraPos.y += 0.1f;
-            centerPos.y += 0.1f;
+            cameraPos.y += 1.0f;
+            centerPos.y += 1.0f;
             break;
         default: ;
         }
@@ -126,5 +130,6 @@ protected:
     ApplicationData* appData;
     unsigned num_objects = 0;
     UniformVars* uniform_vars;
+    skybox* skyboxRef;
     glm::mat4 currentViewMat() { return lookAt(cameraPos, centerPos, glm::vec3(0.0, 1.0, 0.0)); }
 };
