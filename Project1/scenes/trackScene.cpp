@@ -37,10 +37,18 @@ object* trackScene::addGround() {
     return addObject(ground_data, createMaterial());
 }
 
+glm::vec3 trackScene::calcCenterPos() {
+    // Calculate the position of the centerpos based on the camerapos and the camera rotation
+    return glm::vec3(cameraPos.x + glm::cos(cameraRotationHor), 3.0f + cameraRotationVer,
+                     cameraPos.z + glm::sin(cameraRotationHor));
+}
+
 void trackScene::resetAndInit() {
+    objectScene::resetAndInit();
+    cameraRotationHor = 0.0f;
+    cameraRotationVer = 0.0f;
     cameraPos = startCameraPos();
-    centerPos = startCenterPos();
-    objects.clear();
+    centerPos = calcCenterPos();
 
     object* ground = addGround();
     ground->modelSpace.scale(GROUND_SIZE);
@@ -53,6 +61,10 @@ void trackScene::resetAndInit() {
     object* house = addObject("Objects/Eigen/exports/osso.obj", "textures/colormap_flip.bmp", createMaterial());
     house->modelSpace.translate(glm::vec3(10.0, 0.0, 0.0))->rotate(glm::radians(90.0f), glm::vec3(0.0, -1.0, 0.0));
 
+    object* car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(),
+                            createMaterial());
+    car->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.013f);
+
     for (unsigned i = 0; i < COUNT; i++) {
         object* obj = addObject("Objects/Eigen/exports/track_curb.obj", "textures/track_curb_texture.bmp",
                                 createMaterial());
@@ -60,22 +72,63 @@ void trackScene::resetAndInit() {
     }
 }
 
-glm::vec3 trackScene::startCameraPos() { return glm::vec3(-15.0, 10.0, 10.0); }
-glm::vec3 trackScene::startCenterPos() { return glm::vec3(0.0, 5.0, -4.0); }
+glm::vec3 trackScene::startCameraPos() { return glm::vec3(-15.0, 3.0, 10.0); }
+glm::vec3 trackScene::startCenterPos() { return glm::vec3(0.0, 3.0, -4.0); }
+
+void trackScene::updateInertia() {
+    if (upnertia > 0.0f) {
+        centerPos.y += 0.1f;
+        cameraPos.y += 0.1f;
+        upnertia -= 0.05f;
+    }
+    else if (cameraPos.y > 3.0f) {
+        centerPos.y -= 0.2f;
+        cameraPos.y -= 0.2f;
+    }
+    else if (cameraPos.y < 3.0f) {
+        cameraPos.y = 3.0f;
+        centerPos.y = 3.0f;
+    }
+}
+
 
 void trackScene::keyboardHandler(unsigned char key) {
+    glm::vec3 direction = calculateDirectionVector(cameraPos, centerPos);
     switch (key) {
-    case 'i': centerPos.z += 1.0f;
+    case 'q': break;
+    case 'e': break;
+    // Pressing spacebar
+    case ' ':
+        if (cameraPos.y > 3.0f) { break; }
+        upnertia = 1.0f;
         break;
-    case 'k': centerPos.z -= 1.0f;
+    // case 'i': centerPos += direction;
+    //     break;
+    // case 'k': centerPos -= direction;
+    //     break;
+    // case 'j': centerPos += direction;
+    //     break;
+    // case 'l': centerPos -= direction;
+    //     break;
+    // case 'o': centerPos.y += 1.0f;
+    //     break;
+    // case 'u': centerPos.y -= 1.0f;
+    //     break;
+    case 'l':
+        cameraRotationHor += 0.1f;
+        centerPos = calcCenterPos();
         break;
-    case 'j': centerPos.x += 1.0f;
+    case 'j':
+        cameraRotationHor -= 0.1f;
+        centerPos = calcCenterPos();
         break;
-    case 'l': centerPos.x -= 1.0f;
+    case 'i':
+        cameraRotationVer += 0.1f;
+        centerPos = calcCenterPos();
         break;
-    case 'o': centerPos.y += 1.0f;
-        break;
-    case 'u': centerPos.y -= 1.0f;
+    case 'k':
+        cameraRotationVer -= 0.1f;
+        centerPos = calcCenterPos();
         break;
     default:
         objectScene::keyboardHandler(key);
@@ -83,5 +136,6 @@ void trackScene::keyboardHandler(unsigned char key) {
     }
 }
 
+void trackScene::preRenderCallback(glm::vec3 light_pos) { updateInertia(); }
 
 trackScene::trackScene(ApplicationData* app_data): objectScene(app_data) { trackScene::resetAndInit(); }
