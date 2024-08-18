@@ -51,7 +51,6 @@ void splineScene::preRenderCallback(glm::vec3 light_pos) {
         car->modelSpace.setLocation(dir);
 
         // Rotate the 0.1 radian
-        auto angle = glm::atan(dir.z, dir.x);
         car->modelSpace.rotate(0.01, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 }
@@ -72,7 +71,7 @@ void splineScene::resetAndInit() {
 
 void splineScene::compileTrack() {
     // Create a track from the spline
-    constexpr int numPoints = 5000;
+    constexpr int numPoints = 10000;
     auto first = trackSpline.getPoint(1.0f / numPoints);
     glm::vec2 last = first;
 
@@ -92,7 +91,7 @@ void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
     float length = glm::length(p2 - p1);
 
     auto dir3d = glm::vec3(dir.x, dir.y, 0.0f);
-    auto crossDir3d = normalize(cross(dir3d, glm::vec3(0.0f, 0.0f, 1.0f)));
+    auto crossDir3d = normalize(cross(dir3d, glm::vec3(0.0f, 0.0f, 10.0f)));
     auto crossDir = glm::vec2(crossDir3d.x, crossDir3d.y);
 
     auto p3 = p1 + crossDir * TRACKWIDTH;
@@ -150,7 +149,7 @@ CatmullRom splineScene::generateTrackSpline() {
     curNum += curInc;
     curInc += rand() % modInc + minInc;
 
-    float radius = 25;
+    float radius = 15;
     while (curNum < fullNum) {
         float angle1 = curNum / fullNum * 2 * glm::pi<float>();
         float x1 = glm::cos(angle1) * radius;

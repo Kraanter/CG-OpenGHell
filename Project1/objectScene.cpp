@@ -66,7 +66,7 @@ void objectScene::clearVBO() {
 objectScene::objectScene(ApplicationData* app_data) : appData(app_data) {
     std::cout << "objectScene constructor\n";
     objectScene::resetAndInit();
-    skyboxRef = new skybox(100);
+    skyboxRef = new skybox(10);
 };
 
 

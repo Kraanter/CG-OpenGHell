@@ -45,8 +45,10 @@ void trackScene::resetAndInit() {
     object* ground = addGround();
     ground->modelSpace.scale(GROUND_SIZE);
 
-    object* tree = addObject("Objects/Eigen/exports/puntboom.obj", "textures/colormap_flip.bmp", createMaterial());
-    tree->modelSpace.translate(glm::vec3(10.0, 0.0, 5.0));
+    for (unsigned i = 0; i < COUNT / 5; i++) {
+        object* obj = addObject("Objects/Eigen/exports/puntboom.obj", "textures/colormap_flip.bmp", createMaterial());
+        obj->modelSpace.translate(glm::vec3(-6, 0.2, i * 8.0 - COUNT));
+    }
 
     object* house = addObject("Objects/Eigen/exports/osso.obj", "textures/colormap_flip.bmp", createMaterial());
     house->modelSpace.translate(glm::vec3(10.0, 0.0, 0.0))->rotate(glm::radians(90.0f), glm::vec3(0.0, -1.0, 0.0));
@@ -58,22 +60,22 @@ void trackScene::resetAndInit() {
     }
 }
 
-glm::vec3 trackScene::startCameraPos() { return glm::vec3(-15.0, 10.0, 0.0); }
-glm::vec3 trackScene::startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
+glm::vec3 trackScene::startCameraPos() { return glm::vec3(-15.0, 10.0, 10.0); }
+glm::vec3 trackScene::startCenterPos() { return glm::vec3(0.0, 5.0, -4.0); }
 
 void trackScene::keyboardHandler(unsigned char key) {
     switch (key) {
-    case 'i': centerPos.z += 0.1f;
+    case 'i': centerPos.z += 1.0f;
         break;
-    case 'k': centerPos.z -= 0.1f;
+    case 'k': centerPos.z -= 1.0f;
         break;
-    case 'j': centerPos.x += 0.1f;
+    case 'j': centerPos.x += 1.0f;
         break;
-    case 'l': centerPos.x -= 0.1f;
+    case 'l': centerPos.x -= 1.0f;
         break;
-    case 'o': centerPos.y += 0.1f;
+    case 'o': centerPos.y += 1.0f;
         break;
-    case 'u': centerPos.y -= 0.1f;
+    case 'u': centerPos.y -= 1.0f;
         break;
     default:
         objectScene::keyboardHandler(key);

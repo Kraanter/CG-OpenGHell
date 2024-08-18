@@ -68,6 +68,7 @@ public:
     void debugPrint();
 };
 
+
 class objectScene {
 public:
     unsigned getNumObjects() { return num_objects; }
@@ -75,33 +76,43 @@ public:
     virtual glm::vec3 startCameraPos() { return glm::vec3(1.0, 1.0, 0.0); }
     virtual glm::vec3 startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
 
+    glm::vec3 calculateDirectionVector(const glm::vec3& cameraPos, const glm::vec3& centerPos) {
+        glm::vec3 direction = normalize(centerPos - cameraPos);
+        direction.y = 0.0f;
+        return direction;
+    }
+
     virtual void keyboardHandler(const unsigned char key) {
+        glm::vec3 direction = calculateDirectionVector(cameraPos, centerPos);
+        constexpr float moveSpeed = 1.0f; // Adjust speed as necessary
+
         switch (key) {
-        case 'w':
-            cameraPos.x -= 1.0f;
-            centerPos.x -= 1.0f;
+        case 'w': // Move forward
+            cameraPos += direction * moveSpeed;
+            centerPos += direction * moveSpeed;
             break;
-        case 's':
-            cameraPos.x += 1.0f;
-            centerPos.x += 1.0f;
+        case 's': // Move backward
+            cameraPos -= direction * moveSpeed;
+            centerPos -= direction * moveSpeed;
             break;
-        case 'd':
-            cameraPos.z -= 1.0f;
-            centerPos.z -= 1.0f;
+        case 'd': // Strafe right
+            cameraPos += normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
+            centerPos += normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
             break;
-        case 'a':
-            cameraPos.z += 1.0f;
-            centerPos.z += 1.0f;
+        case 'a': // Strafe left
+            cameraPos -= normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
+            centerPos -= normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
             break;
-        case 'q':
-            cameraPos.y -= 1.0f;
-            centerPos.y -= 1.0f;
+        case 'q': // Move down
+            cameraPos.y -= moveSpeed;
+            centerPos.y -= moveSpeed;
             break;
-        case 'e':
-            cameraPos.y += 1.0f;
-            centerPos.y += 1.0f;
+        case 'e': // Move up
+            cameraPos.y += moveSpeed;
+            centerPos.y += moveSpeed;
             break;
-        default: ;
+        default:
+            break;
         }
     }
 
