@@ -13,12 +13,8 @@ public:
 
 private:
     float upnertia = 0.0f;
-    float cameraRotationHor = 0.0f;
-    float cameraRotationVer = 0.0f;
     glm::vec3 prevCameraPos;
-    glm::vec3 prevCameraCenter;
-    float prevCameraRotationHor = 0.0f;
-    float prevCameraRotationVer = 0.0f;
+    glm::vec2 prevCameraAngles;
     bool isFlying = false;
     void updateInertia();
 };

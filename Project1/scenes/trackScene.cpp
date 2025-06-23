@@ -42,8 +42,6 @@ object* trackScene::addGround() {
 
 void trackScene::resetAndInit() {
     objectScene::resetAndInit();
-    cameraRotationHor = 0.0f;
-    cameraRotationVer = 0.0f;
     cameraPos = startCameraPos();
     prevCameraPos = startCameraPos();
     prevCameraPos.y = 10.0f;
@@ -83,6 +81,7 @@ void trackScene::updateInertia() {
 
 void trackScene::keyboardHandler(unsigned char key) {
     glm::vec3 currentPos;
+    glm::vec2 currentAngles;
 
     switch (key) {
     case 'v':
@@ -90,6 +89,11 @@ void trackScene::keyboardHandler(unsigned char key) {
         currentPos = cameraPos;
         cameraPos = prevCameraPos;
         prevCameraPos = currentPos;
+
+        currentAngles = glm::vec2(cameraAlpha, cameraBeta);
+        cameraAlpha = prevCameraAngles.x;
+        cameraBeta = prevCameraAngles.y;
+        prevCameraAngles = currentAngles;
 
         isFlying = !isFlying;
         break;
