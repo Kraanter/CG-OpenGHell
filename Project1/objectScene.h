@@ -137,7 +137,11 @@ protected:
     skybox* skyboxRef;
 
     glm::mat4 currentViewMat() {
-        return lookAt(cameraPos, cameraPos + calculateDirectionVector(true),
-                      glm::vec3(0.0, 1.0, 0.0));
+        glm::vec3 dir = calculateDirectionVector(true);
+        glm::vec3 center = cameraPos + dir;
+
+        std::cout << "Camera Position: " << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << std::endl;
+
+        return lookAt(cameraPos, center, glm::vec3(0.0, 1.0, 0.0));
     }
 };

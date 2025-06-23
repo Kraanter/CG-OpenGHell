@@ -26,5 +26,5 @@ private:
     object* car;
     void getAllCars();
     object* addCar(const char* car_path, const char* texture_path);
-    glm::vec3 calcCameraPos();
+    void updateCameraPos();
 };

@@ -7,9 +7,15 @@
 #include "../FileSys.h"
 #include "../glsl.h"
 
-glm::vec3 carScene::startCameraPos() { return calcCameraPos(); }
+glm::vec3 carScene::startCameraPos() {
+    updateCameraPos();
+    return cameraPos;
+}
 
-carScene::carScene(ApplicationData* app_data): objectScene(app_data) { carScene::resetAndInit(); }
+carScene::carScene(ApplicationData* app_data): objectScene(app_data) {
+    useVerticalMovement = true;
+    carScene::resetAndInit();
+}
 
 constexpr int RADIUS_INCREMENT = 1;
 constexpr int HEIGHT_INCREMENT = 1;
@@ -46,14 +52,20 @@ void carScene::keyboardHandler(const unsigned char key) {
     default:
         return;
     }
-    cameraPos = calcCameraPos();
+    updateCameraPos();
 }
 
-glm::vec3 carScene::calcCameraPos() {
+void carScene::updateCameraPos() {
     float angle = camPercentage * 2.0f * M_PI;
-    float x = camRadius * cos(angle);
-    float z = camRadius * sin(angle);
-    return glm::vec3(x, camHeight, z);
+    float x = camRadius * sin(-angle);
+    float z = camRadius * cos(-angle);
+    cameraPos = glm::vec3(x, camHeight, z);
+
+    // center is 0, 0, 0
+    auto center = cameraPos * -1.0f;
+    // Get the alpha and beta angles
+    cameraAlpha = atan2(center.x, center.z);
+    cameraBeta = asin(center.y / length(center));
 }
 
 void carScene::resetAndInit() {
