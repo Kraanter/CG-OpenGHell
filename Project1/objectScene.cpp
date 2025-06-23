@@ -30,6 +30,18 @@ ModelSpace* ModelSpace::scale(float scale) {
     return this;
 }
 
+glm::vec3 createVector(float alpha, float beta) {
+    float x = cos(beta) * sin(alpha);
+    float y = sin(beta);
+    float z = cos(beta) * cos(alpha);
+    return glm::vec3(x, y, z);
+}
+
+glm::vec3 objectScene::calculateDirectionVector(bool withVertical) {
+    if (!withVertical) { return createVector(cameraAlpha, 0.0f); }
+    return createVector(cameraAlpha, cameraBeta);
+}
+
 object::object(objectData data, Material* material) : data(data), material(material), modelSpace(ModelSpace()) {}
 
 void object::bindVBO(GLuint program_id) { data.bindVBO(program_id); }
@@ -66,7 +78,7 @@ void objectScene::clearVBO() {
 objectScene::objectScene(ApplicationData* app_data) : appData(app_data) {
     std::cout << "objectScene constructor\n";
     objectScene::resetAndInit();
-    skyboxRef = new skybox(10);
+    skyboxRef = new skybox(5);
 };
 
 
@@ -106,142 +118,6 @@ void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program
 }
 
 Material* objectScene::createMaterial() {
-    const auto material = new Material();
-    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
-    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
-    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
-    material->power = 50.0;
-    return material;
-}
-
-object* skybox::createSkyboxData(int size) {
-    objectData data;
-    data.vertices = {
-        // Front face
-        glm::vec3(-size, -size, -size),
-        glm::vec3(-size, -size, size),
-        glm::vec3(-size, size, size),
-        glm::vec3(-size, -size, -size),
-        glm::vec3(-size, size, size),
-        glm::vec3(-size, size, -size),
-        // Right face
-        glm::vec3(size, -size, -size),
-        glm::vec3(size, -size, size),
-        glm::vec3(size, size, size),
-        glm::vec3(size, -size, -size),
-        glm::vec3(size, size, size),
-        glm::vec3(size, size, -size),
-        // Back face
-        glm::vec3(-size, -size, -size),
-        glm::vec3(-size, size, -size),
-        glm::vec3(size, size, -size),
-        glm::vec3(-size, -size, -size),
-        glm::vec3(size, size, -size),
-        glm::vec3(size, -size, -size),
-        // Left face
-        glm::vec3(-size, -size, size),
-        glm::vec3(-size, size, size),
-        glm::vec3(size, size, size),
-        glm::vec3(-size, -size, size),
-        glm::vec3(size, size, size),
-        glm::vec3(size, -size, size),
-        // Top face
-        glm::vec3(-size, size, -size),
-        glm::vec3(-size, size, size),
-        glm::vec3(size, size, size),
-        glm::vec3(-size, size, -size),
-        glm::vec3(size, size, size),
-        glm::vec3(size, size, -size),
-        // Bottom face
-        glm::vec3(-size, -size, -size),
-        glm::vec3(-size, -size, size),
-        glm::vec3(size, -size, size),
-        glm::vec3(-size, -size, -size),
-        glm::vec3(size, -size, size),
-        glm::vec3(size, -size, -size),
-    };
-    data.uvs = {
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-        glm::vec2(0.55, 0.55),
-    };
-    // Normals for the skybox are in the opposite direction of the faces
-    data.normals = {
-        glm::vec3(0.0, 0.0, 1.0),
-        glm::vec3(0.0, 0.0, 1.0),
-        glm::vec3(0.0, 0.0, 1.0),
-        glm::vec3(0.0, 0.0, 1.0),
-        glm::vec3(0.0, 0.0, 1.0),
-        glm::vec3(0.0, 0.0, 1.0),
-        glm::vec3(0.0, 0.0, -1.0),
-        glm::vec3(0.0, 0.0, -1.0),
-        glm::vec3(0.0, 0.0, -1.0),
-        glm::vec3(0.0, 0.0, -1.0),
-        glm::vec3(0.0, 0.0, -1.0),
-        glm::vec3(0.0, 0.0, -1.0),
-        glm::vec3(1.0, 0.0, 0.0),
-        glm::vec3(1.0, 0.0, 0.0),
-        glm::vec3(1.0, 0.0, 0.0),
-        glm::vec3(1.0, 0.0, 0.0),
-        glm::vec3(1.0, 0.0, 0.0),
-        glm::vec3(1.0, 0.0, 0.0),
-        glm::vec3(-1.0, 0.0, 0.0),
-        glm::vec3(-1.0, 0.0, 0.0),
-        glm::vec3(-1.0, 0.0, 0.0),
-        glm::vec3(-1.0, 0.0, 0.0),
-        glm::vec3(-1.0, 0.0, 0.0),
-        glm::vec3(-1.0, 0.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        glm::vec3(0.0, -1.0, 0.0),
-        glm::vec3(0.0, -1.0, 0.0),
-        glm::vec3(0.0, -1.0, 0.0),
-        glm::vec3(0.0, -1.0, 0.0),
-        glm::vec3(0.0, -1.0, 0.0),
-        glm::vec3(0.0, -1.0, 0.0),
-    };
-
-    return new object(data, createMaterial());
-}
-
-Material* skybox::createMaterial() {
     const auto material = new Material();
     material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
     material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);

@@ -1,5 +1,8 @@
 ﻿#include "trackScene.h"
 
+#include <iostream>
+#include <ostream>
+
 constexpr unsigned int COUNT = 2000;
 constexpr unsigned int GROUND_SIZE = 4000;
 
@@ -37,18 +40,13 @@ object* trackScene::addGround() {
     return addObject(ground_data, createMaterial());
 }
 
-glm::vec3 trackScene::calcCenterPos() {
-    // Calculate the position of the centerpos based on the camerapos and the camera rotation
-    return glm::vec3(cameraPos.x + glm::cos(cameraRotationHor), 3.0f + cameraRotationVer,
-                     cameraPos.z + glm::sin(cameraRotationHor));
-}
-
 void trackScene::resetAndInit() {
     objectScene::resetAndInit();
     cameraRotationHor = 0.0f;
     cameraRotationVer = 0.0f;
     cameraPos = startCameraPos();
-    centerPos = calcCenterPos();
+    prevCameraPos = startCameraPos();
+    prevCameraPos.y = 10.0f;
 
     object* ground = addGround();
     ground->modelSpace.scale(GROUND_SIZE);
@@ -73,51 +71,49 @@ void trackScene::resetAndInit() {
 }
 
 glm::vec3 trackScene::startCameraPos() { return glm::vec3(-15.0, 3.0, 10.0); }
-glm::vec3 trackScene::startCenterPos() { return glm::vec3(0.0, 3.0, -4.0); }
 
 void trackScene::updateInertia() {
-    if (upnertia > 0.0f) {
-        centerPos.y += 0.1f;
-        cameraPos.y += 0.1f;
-        upnertia -= 0.05f;
-    }
-    else if (cameraPos.y > 3.0f) {
-        centerPos.y -= 0.2f;
-        cameraPos.y -= 0.2f;
-    }
-    else if (cameraPos.y < 3.0f) {
-        cameraPos.y = 3.0f;
-        centerPos.y = 3.0f;
-    }
+    if (isFlying) return;
+
+    if (upnertia > 0.0f) { upnertia -= 0.05f; }
+    else if (cameraPos.y > 3.0f) { cameraPos.y -= 0.2f; }
+    else if (cameraPos.y < 3.0f) { cameraPos.y = 3.0f; }
 }
 
 
 void trackScene::keyboardHandler(unsigned char key) {
-    glm::vec3 direction = calculateDirectionVector(cameraPos, centerPos);
+    glm::vec3 currentPos;
+
     switch (key) {
-    case 'q': break;
-    case 'e': break;
+    case 'v':
+        // Swap the camera position with the previous camera position
+        currentPos = cameraPos;
+        cameraPos = prevCameraPos;
+        prevCameraPos = currentPos;
+
+        isFlying = !isFlying;
+        break;
     case ' ':
-        if (cameraPos.y > 3.0f) { break; }
+        if (isFlying || cameraPos.y > 3.0f) break;
         upnertia = 1.0f;
         break;
     case 'l':
-        cameraRotationHor += 0.1f;
-        centerPos = calcCenterPos();
+        cameraAlpha -= 0.1f;
         break;
     case 'j':
-        cameraRotationHor -= 0.1f;
-        centerPos = calcCenterPos();
+        cameraAlpha += 0.1f;
         break;
     case 'i':
-        cameraRotationVer += 0.1f;
-        centerPos = calcCenterPos();
+        cameraBeta += 0.1f;
         break;
     case 'k':
-        cameraRotationVer -= 0.1f;
-        centerPos = calcCenterPos();
+        cameraBeta -= 0.1f;
         break;
+    case 'q':
+    case 'e':
+        if (!isFlying) break;
     default:
+        useVerticalMovement = isFlying;
         objectScene::keyboardHandler(key);
         break;
     }

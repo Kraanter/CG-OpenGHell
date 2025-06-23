@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 #include <glm/gtc/matrix_transform.hpp>
@@ -74,42 +76,29 @@ public:
     unsigned getNumObjects() { return num_objects; }
 
     virtual glm::vec3 startCameraPos() { return glm::vec3(1.0, 1.0, 0.0); }
-    virtual glm::vec3 startCenterPos() { return glm::vec3(0.0, 0.0, 0.0); }
-
-    glm::vec3 calculateDirectionVector(const glm::vec3& cameraPos, const glm::vec3& centerPos) {
-        glm::vec3 direction = normalize(centerPos - cameraPos);
-        direction.y = 0.0f;
-        return direction;
-    }
 
     virtual void keyboardHandler(const unsigned char key) {
-        glm::vec3 direction = calculateDirectionVector(cameraPos, centerPos);
+        glm::vec3 direction = calculateDirectionVector(useVerticalMovement);
         constexpr float moveSpeed = 1.0f; // Adjust speed as necessary
 
         switch (key) {
         case 'w': // Move forward
-            cameraPos += direction * moveSpeed;
-            centerPos += direction * moveSpeed;
+            cameraPos += normalize(direction) * moveSpeed;
             break;
         case 's': // Move backward
-            cameraPos -= direction * moveSpeed;
-            centerPos -= direction * moveSpeed;
+            cameraPos -= normalize(direction) * moveSpeed;
             break;
         case 'd': // Strafe right
             cameraPos += normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
-            centerPos += normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
             break;
         case 'a': // Strafe left
             cameraPos -= normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
-            centerPos -= normalize(cross(direction, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
             break;
         case 'q': // Move down
             cameraPos.y -= moveSpeed;
-            centerPos.y -= moveSpeed;
             break;
         case 'e': // Move up
             cameraPos.y += moveSpeed;
-            centerPos.y += moveSpeed;
             break;
         default:
             break;
@@ -118,15 +107,16 @@ public:
 
     virtual void resetAndInit() {
         cameraPos = startCameraPos();
-        centerPos = startCenterPos();
+        cameraAlpha = 0;
+        cameraBeta = 0;
         objects.clear();
         num_objects = 0;
     }
 
     void clearVBO();
+    glm::vec3 calculateDirectionVector(bool withVertical);
 
     glm::vec3 cameraPos = startCameraPos();
-    glm::vec3 centerPos = startCenterPos();
     std::vector<object> objects = std::vector<object>();
 
     objectScene(ApplicationData* appData);
@@ -140,7 +130,14 @@ public:
 protected:
     ApplicationData* appData;
     unsigned num_objects = 0;
+    float cameraAlpha = 0.0f;
+    float cameraBeta = 0.0f;
+    bool useVerticalMovement = false;
     UniformVars* uniform_vars;
     skybox* skyboxRef;
-    glm::mat4 currentViewMat() { return lookAt(cameraPos, centerPos, glm::vec3(0.0, 1.0, 0.0)); }
+
+    glm::mat4 currentViewMat() {
+        return lookAt(cameraPos, cameraPos + calculateDirectionVector(true),
+                      glm::vec3(0.0, 1.0, 0.0));
+    }
 };

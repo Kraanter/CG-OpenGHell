@@ -6,7 +6,6 @@
 class splineScene : public objectScene {
 public:
     glm::vec3 startCameraPos() override;
-    glm::vec3 startCenterPos() override;
     void keyboardHandler(unsigned char key) override;
     void resetAndInit() override;
     void preRenderCallback(glm::vec3 light_pos) override;
@@ -19,6 +18,7 @@ private:
     float trackCompletion = 0.0f;
     object* car;
     void updateTrackCompletion();
+    bool lockedCamera = false;
     glm::vec3 currentTrackPos();
     glm::vec2 currentTrackDir();
     CatmullRom trackSpline;

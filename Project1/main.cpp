@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "FileSys.h"
 #include "glsl.h"
 #include "objectScene.h"
 #include "sceneManager.h"
@@ -160,10 +161,10 @@ void InitShaders() {
 //------------------------------------------------------------
 // void InitObjects()
 //------------------------------------------------------------
-void InitScenes() {
-    stage_manager.addScene(new carScene(&app_data));
-    stage_manager.addScene(new splineScene(&app_data));
-    stage_manager.addScene(new trackScene(&app_data));
+void InitScenes(ApplicationData* app_data) {
+    stage_manager.addScene(new trackScene(app_data));
+    stage_manager.addScene(new carScene(app_data));
+    stage_manager.addScene(new splineScene(app_data));
 }
 
 
@@ -187,11 +188,32 @@ void InitBuffers() {
     stage_manager.fillUniformVars(startProjection, light.position);
 }
 
+
+void getAllCars(ApplicationData* appData) {
+    if (appData->carFiles.size() > 0) { return; }
+
+    vector<string> carDirs = FileSys::getFilesInDir("objects/Asseto Corsa");
+
+    // Print all files in the directory
+    for (auto& file : carDirs) {
+        vector<string> dirContents = FileSys::getFilesInDir(file);
+        string objFile = "";
+        string textureFile = "";
+        for (auto& dirContent : dirContents) {
+            if (dirContent.find(".obj") != string::npos) { objFile = dirContent; }
+            else if (dirContent.find(".bmp") != string::npos) { textureFile = dirContent; }
+        }
+        std::cout << "Car: " << objFile << " Texture: " << textureFile << endl;
+        appData->carFiles.push_back({objFile, textureFile});
+    }
+}
+
 int main(int argc, char** argv) {
     srand(time(nullptr));
     InitGlutGlew(argc, argv);
     InitShaders();
-    InitScenes();
+    getAllCars(&app_data);
+    InitScenes(&app_data);
     InitMaterialsLight();
     InitBuffers();
 

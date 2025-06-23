@@ -9,8 +9,6 @@
 
 glm::vec3 carScene::startCameraPos() { return calcCameraPos(); }
 
-glm::vec3 carScene::startCenterPos() { return glm::vec3(0.0f, 0.0f, 0.0f); }
-
 carScene::carScene(ApplicationData* app_data): objectScene(app_data) { carScene::resetAndInit(); }
 
 constexpr int RADIUS_INCREMENT = 1;
@@ -58,33 +56,12 @@ glm::vec3 carScene::calcCameraPos() {
     return glm::vec3(x, camHeight, z);
 }
 
-void carScene::getAllCars() {
-    if (appData->carFiles.size() > 0) { return; }
-
-    vector<string> carDirs = FileSys::getFilesInDir("objects/Asseto Corsa");
-
-    // Print all files in the directory
-    for (auto& file : carDirs) {
-        vector<string> dirContents = FileSys::getFilesInDir(file);
-        string objFile = "";
-        string textureFile = "";
-        for (auto& dirContent : dirContents) {
-            if (dirContent.find(".obj") != string::npos) { objFile = dirContent; }
-            else if (dirContent.find(".bmp") != string::npos) { textureFile = dirContent; }
-        }
-        std::cout << "Car: " << objFile << " Texture: " << textureFile << endl;
-        appData->carFiles.push_back({objFile, textureFile});
-    }
-}
-
 void carScene::resetAndInit() {
     objectScene::resetAndInit();
     camRadius = 6;
     camHeight = 2;
     camPercentage = 0.25;
     cameraPos = startCameraPos();
-    centerPos = startCenterPos();
-    getAllCars();
 
     initScene();
 }

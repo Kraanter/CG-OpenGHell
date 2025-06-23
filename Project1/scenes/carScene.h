@@ -6,7 +6,6 @@
 class carScene : public objectScene {
 public:
     glm::vec3 startCameraPos() override;
-    glm::vec3 startCenterPos() override;
     carScene(ApplicationData* appData);
     carScene() = delete;
     void keyboardHandler(unsigned char key) override;

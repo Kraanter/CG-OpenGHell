@@ -7,10 +7,28 @@ splineScene::splineScene(ApplicationData* application_data): objectScene(applica
 }
 
 glm::vec3 splineScene::startCameraPos() { return glm::vec3(0.01, 1, 0); }
-glm::vec3 splineScene::startCenterPos() { return glm::vec3(0, 0, 0); }
 
 void splineScene::keyboardHandler(unsigned char key) {
     switch (key) {
+    case ' ':
+        lockedCamera = !lockedCamera;
+        break;
+    case 'l':
+        // cameraRotationHor += 0.1f;
+        // centerPos = calcCenterPos();
+        break;
+    case 'j':
+        // cameraRotationHor -= 0.1f;
+        // centerPos = calcCenterPos();
+        break;
+    case 'i':
+        // cameraRotationVer += 0.1f;
+        // centerPos = calcCenterPos();
+        break;
+    case 'k':
+        // cameraRotationVer -= 0.1f;
+        // centerPos = calcCenterPos();
+        break;
     case 'e':
         cameraPos.y += 0.1;
         break;
@@ -42,8 +60,10 @@ void splineScene::updateTrackCompletion() {
 void splineScene::preRenderCallback(glm::vec3 light_pos) {
     updateTrackCompletion();
 
-    // Point the camera in the direction of the car
-    centerPos = currentTrackPos();
+    if (lockedCamera) {
+        // Point the camera in the direction of the car and track the car
+        // cameraPos = currentTrackPos() + glm::vec3(0.01, 1, 0);
+    }
 
     if (car != nullptr) {
         auto dir = currentTrackPos();
@@ -58,7 +78,6 @@ void splineScene::preRenderCallback(glm::vec3 light_pos) {
 void splineScene::resetAndInit() {
     objectScene::resetAndInit();
     cameraPos = startCameraPos();
-    centerPos = startCenterPos();
 
     trackSpline = generateTrackSpline();
     compileTrack();
