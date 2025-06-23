@@ -74,8 +74,8 @@ void trackScene::updateInertia() {
     if (isFlying) return;
 
     if (upnertia > 0.0f) {
-        upnertia -= 0.05f;
-        cameraPos.y += upnertia;
+        upnertia -= 0.1f;
+        cameraPos.y += upnertia * 0.6f;
     }
     else if (cameraPos.y > 3.0f) { cameraPos.y -= 0.2f; }
     else if (cameraPos.y < 3.0f) { cameraPos.y = 3.0f; }
