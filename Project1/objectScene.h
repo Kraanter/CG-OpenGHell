@@ -16,7 +16,13 @@ struct ApplicationData {
     std::vector<std::tuple<std::string, std::string>> carFiles;
     GLuint program_id;
 
-    std::string getSelectedCarObj() { return std::get<0>(carFiles[selectedCar]); }
+    std::string getSelectedCarObj() {
+        auto carFile = std::get<0>(this->carFiles[selectedCar]);
+        std::cout << "Selected car: " << carFile << std::endl;
+
+        return carFile;
+    }
+
     std::string getSelectedCarTxt() { return std::get<1>(carFiles[selectedCar]); }
 };
 
@@ -109,8 +115,6 @@ public:
         cameraPos = startCameraPos();
         cameraAlpha = 0;
         cameraBeta = 0;
-        objects.clear();
-        num_objects = 0;
     }
 
     void clearVBO();
@@ -139,8 +143,6 @@ protected:
     glm::mat4 currentViewMat() {
         glm::vec3 dir = calculateDirectionVector(true);
         glm::vec3 center = cameraPos + dir;
-
-        std::cout << "Camera Position: " << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << std::endl;
 
         return lookAt(cameraPos, center, glm::vec3(0.0, 1.0, 0.0));
     }

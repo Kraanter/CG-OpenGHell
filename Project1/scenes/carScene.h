@@ -17,6 +17,7 @@ private:
     void reloadScene();
     std::string selectedCarObj() { return appData->getSelectedCarObj(); }
     std::string selectedCarTxt() { return appData->getSelectedCarTxt(); }
+    void preRenderCallback(glm::vec3 light_pos) override;
     unsigned camRadius;
     unsigned camHeight;
     float camPercentage;

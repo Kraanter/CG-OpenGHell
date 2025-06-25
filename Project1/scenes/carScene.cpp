@@ -85,6 +85,10 @@ void carScene::initScene() {
     car = addCar(selectedCarObj().c_str(), selectedCarTxt().c_str());
 }
 
+void carScene::preRenderCallback(glm::vec3 light_pos) {
+    car->modelSpace.rotate(glm::radians(0.090f), glm::vec3(0.0, 1.0, 0.0));
+}
+
 void carScene::nextCar() {
     appData->selectedCar++;
     if (appData->selectedCar >= appData->carFiles.size()) { appData->selectedCar = 0; }
