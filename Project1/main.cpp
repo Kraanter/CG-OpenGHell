@@ -12,9 +12,7 @@
 #include "glsl.h"
 #include "objectScene.h"
 #include "sceneManager.h"
-#include "scenes/carScene.h"
-#include "scenes/splineScene.h"
-#include "scenes/trackScene.h"
+#include "scenes/gradingScene.h"
 
 using namespace std;
 
@@ -25,14 +23,14 @@ using namespace std;
 
 constexpr int WIDTH = 800, HEIGHT = 800;
 
-const char* fragshader_name = "fragmentshader.frag";
-const char* vertexshader_name = "vertexshader.vert";
+auto fragshader_name = "fragmentshader.frag";
+auto vertexshader_name = "vertexshader.vert";
 
 const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f);
 
 constexpr unsigned int DELTA_TIME = 10;
 
-ApplicationData app_data = ApplicationData{0, vector<tuple<string, string>>(), 0};
+auto app_data = ApplicationData{0, vector<tuple<string, string>>(), 0};
 
 //--------------------------------------------------------------------------------
 // Typedefs
@@ -162,9 +160,10 @@ void InitShaders() {
 // void InitObjects()
 //------------------------------------------------------------
 void InitScenes(ApplicationData* app_data) {
-    stage_manager.addScene(new trackScene(app_data));
-    stage_manager.addScene(new carScene(app_data));
-    stage_manager.addScene(new splineScene(app_data));
+    stage_manager.addScene(new gradingScene(app_data));
+    // stage_manager.addScene(new trackScene(app_data));
+    // stage_manager.addScene(new carScene(app_data));
+    // stage_manager.addScene(new splineScene(app_data));
 }
 
 
@@ -212,7 +211,7 @@ int main(int argc, char** argv) {
     srand(time(nullptr));
     InitGlutGlew(argc, argv);
     InitShaders();
-    getAllCars(&app_data);
+    // getAllCars(&app_data);
     InitScenes(&app_data);
     InitMaterialsLight();
     InitBuffers();

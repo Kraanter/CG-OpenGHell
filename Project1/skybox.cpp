@@ -3,7 +3,10 @@
 #include "objectData.h"
 #include "objectScene.h"
 
-skybox::skybox(int size) { objectRef = createSkyboxData(size); }
+skybox::skybox(int size) {
+    objectRef = createSkyboxData(size);
+    objectRef->visible = true;
+}
 
 object* skybox::createSkyboxData(int size) {
     objectData data;

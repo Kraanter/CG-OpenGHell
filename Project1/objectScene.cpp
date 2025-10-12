@@ -75,13 +75,12 @@ void objectScene::clearVBO() {
         glDeleteVertexArrays(1, &obj.data.vao);
 }
 
-objectScene::objectScene(ApplicationData* app_data) : appData(app_data) {
-    std::cout << "objectScene constructor\n";
+objectScene::objectScene(ApplicationData* app_data) {
+    this->appData = app_data;
     objectScene::resetAndInit();
     skyboxRef = new skybox(5);
 };
-
-
+ 
 object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material, bool visible) {
     objectData data(obj_path, txt_path);
 

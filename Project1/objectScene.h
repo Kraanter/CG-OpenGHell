@@ -16,7 +16,7 @@ struct ApplicationData {
     std::vector<std::tuple<std::string, std::string>> carFiles;
     GLuint program_id;
 
-    std::string getSelectedCarObj() {
+    std::string getSelectedCarObj() const {
         auto carFile = std::get<0>(this->carFiles[selectedCar]);
         std::cout << "Selected car: " << carFile << std::endl;
 

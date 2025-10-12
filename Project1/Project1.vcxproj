@@ -142,6 +142,7 @@
         <ClCompile Include="objectScene.cpp"/>
         <ClCompile Include="objloader.cpp"/>
         <ClCompile Include="sceneManager.cpp"/>
+        <ClCompile Include="scenes\gradingScene.cpp" />
         <ClCompile Include="scenes\splineScene.cpp"/>
         <ClCompile Include="scenes\carScene.cpp"/>
         <ClCompile Include="scenes\trackScene.cpp"/>
@@ -156,6 +157,7 @@
         <ClInclude Include="objectScene.h"/>
         <ClInclude Include="objloader.h"/>
         <ClInclude Include="sceneManager.h"/>
+        <ClInclude Include="scenes\gradingScene.h" />
         <ClInclude Include="scenes\splineScene.h"/>
         <ClInclude Include="scenes\carScene.h"/>
         <ClInclude Include="scenes\trackScene.h"/>
