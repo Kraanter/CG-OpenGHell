@@ -64,13 +64,18 @@ void splineScene::preRenderCallback(glm::vec3 light_pos) {
     updateTrackCompletion();
 
     if (lockedCamera) {
-        // Point the camera in the direction of the car and track the car
-        // cameraPos = currentTrackPos() + glm::vec3(0.01, 1, 0);
+        glm::vec2 dir = currentTrackDir();
+        if (glm::length(dir) > 1e-5f) {
+            glm::vec3 forward(dir.x, 0.0f, dir.y);
+            cameraPos = carPos - normalize(forward) * 12.0f + glm::vec3(0.0f, 6.0f, 0.0f);
+            cameraAlpha = carYaw;
+            cameraBeta = -0.15f;
+        }
     }
 
     if (car != nullptr) {
         carPos = currentTrackPos();
-        carPos.y = 1.5f;
+        carPos.y = 0.25f;
         glm::vec2 dir = currentTrackDir();
         if (glm::length(dir) > 1e-5f) {
             carYaw = std::atan2(dir.x, dir.y);
@@ -107,7 +112,7 @@ void splineScene::resetAndInit() {
     car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(), carMaterial, true);
     car->modelSpace.scale(0.01f);
     carPos = currentTrackPos();
-    carPos.y = 1.5f;
+    carPos.y = 0.25f;
     carYaw = 0.0f;
     std::cout << "[spline] resetAndInit done" << std::endl;
 }
@@ -117,7 +122,7 @@ void splineScene::resetAndInit() {
 void splineScene::compileTrack() {
     // Create a track from the spline
     constexpr int numPoints = 1600;
-    constexpr float trackY = 1.5f;
+    constexpr float trackY = 0.2f;
 
     objectData data;
     data.setTexture("textures/track.bmp");
@@ -260,8 +265,8 @@ void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
 CatmullRom splineScene::generateTrackSpline() {
     auto spline = CatmullRom();
     constexpr int controlPoints = 16;
-    constexpr float baseRadius = 120.0f;
-    constexpr float radiusJitter = 50.0f;
+    constexpr float baseRadius = 70.0f;
+    constexpr float radiusJitter = 25.0f;
     constexpr float angleJitter = 0.5f;
 
     std::vector<float> deltas;

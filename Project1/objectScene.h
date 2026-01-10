@@ -127,6 +127,7 @@ public:
             break;
         case 'q': // Move down
             cameraPos.y -= moveSpeed;
+            if (cameraPos.y < 0.1f) { cameraPos.y = 0.1f; }
             break;
         case 'e': // Move up
             cameraPos.y += moveSpeed;
