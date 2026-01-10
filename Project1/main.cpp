@@ -13,7 +13,6 @@
 #include "objectScene.h"
 #include "sceneManager.h"
 #include "scenes/carScene.h"
-#include "scenes/gradingScene.h"
 #include "scenes/splineScene.h"
 #include "scenes/trackScene.h"
 
@@ -213,7 +212,6 @@ void InitShaders() {
 // void InitObjects()
 //------------------------------------------------------------
 void InitScenes(ApplicationData* app_data) {
-    stage_manager.addScene(new gradingScene(app_data));
     stage_manager.addScene(new trackScene(app_data));
     stage_manager.addScene(new carScene(app_data));
     stage_manager.addScene(new splineScene(app_data));
