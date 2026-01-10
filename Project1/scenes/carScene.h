@@ -10,6 +10,8 @@ public:
     carScene() = delete;
     void keyboardHandler(unsigned char key) override;
     void resetAndInit() override;
+    void onSelectedCarChanged() override;
+    void onCarColorChanged() override;
     unsigned selectedCarId() { return appData->selectedCar; }
 
 private:

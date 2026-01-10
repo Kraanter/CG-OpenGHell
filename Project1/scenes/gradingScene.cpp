@@ -17,6 +17,7 @@ void gradingScene::resetAndInit() {
 void gradingScene::initScene() {
     std::cout << "Cheese stengel" << std::endl;
 
+    addGroundPlane(200.0f);
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial());
 
     // Skybox is handled by objectScene.

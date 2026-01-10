@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "glsl.h"
+#include "texture.h"
 
 ModelSpace::ModelSpace(): model(glm::mat4(1.0f)) {}
 
@@ -105,9 +106,46 @@ object* objectScene::addObject(objectData data, Material* material, bool visible
     return &objects[num_objects - 1];
 }
 
+object* objectScene::addGroundPlane(float size, const char* texture_path, float uv_scale) {
+    (void)texture_path;
+    (void)uv_scale;
+    objectData ground_data;
+    ground_data.texture_id = createSolidTexture(160, 160, 160);
+    ground_data.vertices = {
+        glm::vec3(-1.0f, 0.0f, -1.0f),
+        glm::vec3(1.0f, 0.0f, -1.0f),
+        glm::vec3(1.0f, 0.0f, 1.0f),
+        glm::vec3(-1.0f, 0.0f, -1.0f),
+        glm::vec3(1.0f, 0.0f, 1.0f),
+        glm::vec3(-1.0f, 0.0f, 1.0f),
+    };
+    ground_data.uvs = {
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(1.0f, 0.0f),
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(0.0f, 1.0f),
+    };
+    ground_data.normals = {
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+    };
 
-void objectScene::render(glm::vec3 light_pos) {
-    preRenderCallback(light_pos);
+    object* ground = addObject(ground_data, createMaterial());
+    ground->modelSpace.scale(size);
+    return ground;
+}
+
+
+void objectScene::render(glm::vec3 light_pos, bool paused) {
+    if (!paused) {
+        preRenderCallback(light_pos);
+    }
     glm::mat4 view = currentViewMat();
     skyboxRef->objectRef->modelSpace.setLocation(cameraPos);
     skyboxRef->objectRef->render(uniform_vars, &view, light_pos);
@@ -129,9 +167,9 @@ void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program
 
 Material* objectScene::createMaterial() {
     const auto material = new Material();
-    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
-    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
-    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
+    material->ambient_color = glm::vec3(0.18f, 0.18f, 0.18f);
+    material->diffuse_color = glm::vec3(0.6f, 0.6f, 0.6f);
+    material->specular_color = glm::vec3(0.4f, 0.4f, 0.4f);
     material->power = 50.0;
     return material;
 }

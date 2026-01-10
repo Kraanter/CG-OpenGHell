@@ -6,7 +6,7 @@ splineScene::splineScene(ApplicationData* application_data): objectScene(applica
     splineScene::resetAndInit();
 }
 
-glm::vec3 splineScene::startCameraPos() { return glm::vec3(0.01, 1, 0); }
+glm::vec3 splineScene::startCameraPos() { return glm::vec3(0.1f, 10.0f, 0.0f); }
 
 void splineScene::keyboardHandler(unsigned char key) {
     switch (key) {
@@ -30,11 +30,14 @@ void splineScene::keyboardHandler(unsigned char key) {
         // centerPos = calcCenterPos();
         break;
     case 'e':
-        cameraPos.y += 0.1;
+        cameraPos.y += 1.0f;
         break;
     case 'q':
-        if (cameraPos.y - 0.1 < 0) { return; }
-        cameraPos.y -= 0.1;
+        if (cameraPos.y - 1.0f < 0) { return; }
+        cameraPos.y -= 1.0f;
+        break;
+    case 'p':
+        inCarView = !inCarView;
         break;
     default:
         objectScene::keyboardHandler(key);
@@ -66,12 +69,23 @@ void splineScene::preRenderCallback(glm::vec3 light_pos) {
     }
 
     if (car != nullptr) {
-        auto dir = currentTrackPos();
+        carPos = currentTrackPos();
+        carPos.y = 1.5f;
+        glm::vec2 dir = currentTrackDir();
+        if (glm::length(dir) > 1e-5f) {
+            carYaw = std::atan2(dir.x, dir.y);
+        }
 
-        car->modelSpace.setLocation(dir);
+        car->modelSpace.reset();
+        car->modelSpace.translate(carPos)
+            ->rotate(carYaw, glm::vec3(0.0f, 1.0f, 0.0f))
+            ->scale(0.01f);
+    }
 
-        // Rotate the 0.1 radian
-        car->modelSpace.rotate(0.01, glm::vec3(0.0f, 1.0f, 0.0f));
+    if (inCarView) {
+        cameraPos = carPos + glm::vec3(0.0f, 1.0f, 0.0f);
+        cameraAlpha = carYaw;
+        cameraBeta = 0.0f;
     }
 }
 
@@ -79,34 +93,124 @@ void splineScene::resetAndInit() {
     objectScene::resetAndInit();
     cameraPos = startCameraPos();
 
+    std::cout << "[spline] resetAndInit start" << std::endl;
+    addGroundPlane(2000.0f);
+    std::cout << "[spline] generating track spline" << std::endl;
     trackSpline = generateTrackSpline();
+    std::cout << "[spline] compiling track mesh" << std::endl;
     compileTrack();
+    std::cout << "[spline] track mesh compiled" << std::endl;
 
     auto* carMaterial = createMaterial();
     carMaterial->use_toon = true;
+    carMaterial->diffuse_color = appData->getSelectedCarColor();
     car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(), carMaterial, true);
-    car->modelSpace.scale(0.001f);
+    car->modelSpace.scale(0.01f);
+    carPos = currentTrackPos();
+    carPos.y = 1.5f;
+    carYaw = 0.0f;
+    std::cout << "[spline] resetAndInit done" << std::endl;
 }
 
-#define TRACKWIDTH 0.3f
+#define TRACKWIDTH 3.0f
 
 void splineScene::compileTrack() {
     // Create a track from the spline
-    constexpr int numPoints = 10000;
+    constexpr int numPoints = 1600;
+    constexpr float trackY = 1.5f;
+
+    objectData data;
+    data.setTexture("textures/track.bmp");
+
+    std::cout << "[spline] compileTrack samples=" << numPoints << std::endl;
     auto first = trackSpline.getPoint(1.0f / numPoints);
     glm::vec2 last = first;
 
     for (float i = 0; i < numPoints - 1; i += 1.0f) {
         float t1 = i / (numPoints - 1.0f);
         glm::vec2 p1 = trackSpline.getPoint(t1);
-        createTrackPart(p1, last);
+        if (glm::length(p1 - last) > 1e-4f) {
+            glm::vec2 dir = normalize(p1 - last);
+            auto dir3d = glm::vec3(dir.x, dir.y, 0.0f);
+            auto crossDir3d = normalize(cross(dir3d, glm::vec3(0.0f, 0.0f, 10.0f)));
+            auto crossDir = glm::vec2(crossDir3d.x, crossDir3d.y);
+
+            auto p3 = last + crossDir * TRACKWIDTH;
+            auto p4 = p1 + crossDir * TRACKWIDTH;
+            auto p5 = p1 - crossDir * TRACKWIDTH;
+            auto p6 = last - crossDir * TRACKWIDTH;
+
+            data.vertices.insert(data.vertices.end(), {
+                glm::vec3(p3.x, trackY, p3.y),
+                glm::vec3(p4.x, trackY, p4.y),
+                glm::vec3(p5.x, trackY, p5.y),
+                glm::vec3(p3.x, trackY, p3.y),
+                glm::vec3(p5.x, trackY, p5.y),
+                glm::vec3(p6.x, trackY, p6.y),
+            });
+            data.uvs.insert(data.uvs.end(), {
+                glm::vec2(1.0f, 1.0f),
+                glm::vec2(1.0f, 0.0f),
+                glm::vec2(0.0f, 0.0f),
+                glm::vec2(1.0f, 1.0f),
+                glm::vec2(0.0f, 0.0f),
+                glm::vec2(0.0f, 1.0f),
+            });
+            data.normals.insert(data.normals.end(), {
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+            });
+        }
         last = p1;
     }
 
-    createTrackPart(last, first);
+    if (glm::length(last - first) > 1e-4f) {
+        glm::vec2 dir = normalize(first - last);
+        auto dir3d = glm::vec3(dir.x, dir.y, 0.0f);
+        auto crossDir3d = normalize(cross(dir3d, glm::vec3(0.0f, 0.0f, 10.0f)));
+        auto crossDir = glm::vec2(crossDir3d.x, crossDir3d.y);
+
+        auto p3 = last + crossDir * TRACKWIDTH;
+        auto p4 = first + crossDir * TRACKWIDTH;
+        auto p5 = first - crossDir * TRACKWIDTH;
+        auto p6 = last - crossDir * TRACKWIDTH;
+
+        data.vertices.insert(data.vertices.end(), {
+            glm::vec3(p3.x, trackY, p3.y),
+            glm::vec3(p4.x, trackY, p4.y),
+            glm::vec3(p5.x, trackY, p5.y),
+            glm::vec3(p3.x, trackY, p3.y),
+            glm::vec3(p5.x, trackY, p5.y),
+            glm::vec3(p6.x, trackY, p6.y),
+        });
+        data.uvs.insert(data.uvs.end(), {
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+        });
+        data.normals.insert(data.normals.end(), {
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+        });
+    }
+
+    std::cout << "[spline] track triangles=" << data.vertices.size() / 3 << std::endl;
+    addObject(data, createMaterial());
 }
 
 void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
+    if (glm::length(p2 - p1) < 1e-4f) { return; }
     glm::vec2 dir = normalize(p2 - p1);
     float angle = glm::atan(dir.y, dir.x);
     float length = glm::length(p2 - p1);
@@ -124,12 +228,12 @@ void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
     data.setTexture("textures/track.bmp");
     data.vertices = {
         // 6 points to create 2 triangles to create a quad p3-p4-p5-p6
-        glm::vec3(p3.x, 0.0f, p3.y),
-        glm::vec3(p4.x, 0.0f, p4.y),
-        glm::vec3(p5.x, 0.0f, p5.y),
-        glm::vec3(p3.x, 0.0f, p3.y),
-        glm::vec3(p5.x, 0.0f, p5.y),
-        glm::vec3(p6.x, 0.0f, p6.y),
+        glm::vec3(p3.x, 1.5f, p3.y),
+        glm::vec3(p4.x, 1.5f, p4.y),
+        glm::vec3(p5.x, 1.5f, p5.y),
+        glm::vec3(p3.x, 1.5f, p3.y),
+        glm::vec3(p5.x, 1.5f, p5.y),
+        glm::vec3(p6.x, 1.5f, p6.y),
 
     };
     data.uvs = {
@@ -155,50 +259,50 @@ void splineScene::createTrackPart(glm::vec2 p1, glm::vec2 p2) {
 
 CatmullRom splineScene::generateTrackSpline() {
     auto spline = CatmullRom();
-    // Desmos: https://www.desmos.com/calculator/qdk6xeflti
-    // This might help you understand the math behind the spline generation
+    constexpr int controlPoints = 16;
+    constexpr float baseRadius = 120.0f;
+    constexpr float radiusJitter = 50.0f;
+    constexpr float angleJitter = 0.5f;
 
-    // Devide a circle in different size parts and generate a random point on a circle the size of each part
-    int minNumCirlceParts = 6;
-    int maxNumCirlceParts = 12;
-    int fullNum = 1000;
-    float curNum = 0.0f;
-    float minInc = fullNum / maxNumCirlceParts;
-    float maxInc = fullNum / minNumCirlceParts;
-    int modInc = maxInc - minInc;
-    float curInc = rand() % modInc + minInc;
-    curNum += curInc;
-    curInc += rand() % modInc + minInc;
-
-    float radius = 15;
-    while (curNum < fullNum) {
-        float angle1 = curNum / fullNum * 2 * glm::pi<float>();
-        float x1 = glm::cos(angle1) * radius;
-        float y1 = glm::sin(angle1) * radius;
-        float angle2 = (curNum + curInc) / fullNum * 2 * glm::pi<float>();
-        float x2 = glm::cos(angle2) * radius;
-        float y2 = glm::sin(angle2) * radius;
-
-        // Create a new circle going through the points (x1, y1) and (x2, y2)
-        float cx = (x1 + x2) / 2;
-        float cy = (y1 + y2) / 2;
-
-        // Distance between 1 and 2
-        float d = glm::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-
-        // C is the center of a new circle with radius
-        float r = d / 1.0f;
-
-        // Calculate a random point on the circle
-        float rangle = rand() / static_cast<float>(RAND_MAX) * 2 * glm::pi<float>();
-        float x = cx + r * glm::cos(rangle);
-        float y = cy + r * glm::sin(rangle);
-
-        spline.addPoint(glm::vec2(x, y));
-
-        curNum += curInc;
-        curInc = rand() % modInc + minInc;
+    std::vector<float> deltas;
+    deltas.reserve(controlPoints);
+    float sum = 0.0f;
+    for (int i = 0; i < controlPoints; ++i) {
+        float base = glm::two_pi<float>() / static_cast<float>(controlPoints);
+        float jitter = (rand() / static_cast<float>(RAND_MAX)) * angleJitter - (angleJitter * 0.5f);
+        float delta = base * (1.0f + jitter);
+        if (delta < base * 0.3f) { delta = base * 0.3f; }
+        deltas.push_back(delta);
+        sum += delta;
     }
 
+    auto* points = new glm::vec2[controlPoints];
+    float angle = 0.0f;
+    for (int i = 0; i < controlPoints; ++i) {
+        angle += deltas[i] * (glm::two_pi<float>() / sum);
+        float jitter = (rand() / static_cast<float>(RAND_MAX)) * radiusJitter;
+        float r = baseRadius + jitter;
+        float x = glm::cos(angle) * r;
+        float y = glm::sin(angle) * r;
+        points[i] = glm::vec2(x, y);
+    }
+    spline.setPoints(points, controlPoints);
+    std::cout << "[spline] control points=" << controlPoints << std::endl;
+
     return spline;
+}
+
+void splineScene::onSelectedCarChanged() {
+    clearVBO();
+    resetAndInit();
+    for (auto& obj : objects) { obj.bindVBO(appData->program_id); }
+}
+
+void splineScene::onCarColorChanged() {
+    if (!objects.empty()) {
+        car = &objects.back();
+    }
+    if (car != nullptr) {
+        car->material->diffuse_color = appData->getSelectedCarColor();
+    }
 }

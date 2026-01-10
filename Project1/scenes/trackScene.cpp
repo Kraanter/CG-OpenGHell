@@ -59,6 +59,7 @@ void trackScene::resetAndInit() {
 
     auto* carMaterial = createMaterial();
     carMaterial->use_toon = true;
+    carMaterial->diffuse_color = appData->getSelectedCarColor();
     object* car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(),
                             carMaterial);
     car->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.013f);

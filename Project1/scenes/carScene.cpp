@@ -31,10 +31,10 @@ void carScene::keyboardHandler(const unsigned char key) {
         camRadius += RADIUS_INCREMENT;
         break;
     case 'a':
-        camPercentage -= PERCENTAGE_INCREMENT;
+        camPercentage += PERCENTAGE_INCREMENT;
         break;
     case 'd':
-        camPercentage += PERCENTAGE_INCREMENT;
+        camPercentage -= PERCENTAGE_INCREMENT;
         break;
     case 'q':
         if (camHeight - HEIGHT_INCREMENT <= 0) { return; }
@@ -79,8 +79,9 @@ void carScene::resetAndInit() {
 }
 
 void carScene::initScene() {
+    addGroundPlane(200.0f);
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial())->
-        modelSpace.translate(glm::vec3(0.0, 0.0, 0.0))->scale(0.25f);
+        modelSpace.translate(glm::vec3(0.0, 0.2, 0.0))->scale(0.25f);
 
     car = addCar(selectedCarObj().c_str(), selectedCarTxt().c_str());
 }
@@ -121,7 +122,24 @@ void carScene::reloadScene() {
 object* carScene::addCar(const char* car_path, const char* texture_path) {
     auto* carMaterial = createMaterial();
     carMaterial->use_toon = true;
+    carMaterial->diffuse_color = appData->getSelectedCarColor();
     auto addedCar = addObject(car_path, texture_path, carMaterial, true);
-    addedCar->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008f);
+    addedCar->modelSpace.translate(glm::vec3(0.0, 0.300, 0.0))->scale(0.008f);
     return addedCar;
+}
+
+void carScene::onCarColorChanged() {
+    if (!objects.empty()) {
+        car = &objects.back();
+    }
+    if (car != nullptr) {
+        car->material->diffuse_color = appData->getSelectedCarColor();
+    }
+}
+
+void carScene::onSelectedCarChanged() {
+    reloadCar();
+    if (car != nullptr) {
+        car->material->diffuse_color = appData->getSelectedCarColor();
+    }
 }

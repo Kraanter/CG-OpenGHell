@@ -7,7 +7,18 @@ sceneManager::sceneManager() {
     uniform_vars = UniformVars();
 };
 
-void sceneManager::render(glm::vec3 light_pos) { scenes_[current_scene_]->render(light_pos); }
+void sceneManager::render(glm::vec3 light_pos, bool paused) {
+    if (scenes_.empty()) { return; }
+
+    unsigned current_selected = scenes_[current_scene_]->getSelectedCarId();
+    if (current_selected != last_selected_car) {
+        for (auto& scene : scenes_)
+            scene->onSelectedCarChanged();
+        last_selected_car = current_selected;
+    }
+
+    scenes_[current_scene_]->render(light_pos, paused);
+}
 
 void sceneManager::bindVBO(GLuint program_id) {
     this->program_id = program_id;
@@ -36,4 +47,9 @@ void sceneManager::clearVBO() {
 void sceneManager::fillUniformVars(glm::mat4 projection, glm::vec3 light_pos) {
     glUniformMatrix4fv(uniform_vars.uniform_proj, 1, GL_FALSE, value_ptr(projection));
     glUniform3fv(uniform_vars.uniform_light_pos, 1, value_ptr(light_pos));
+}
+
+void sceneManager::onCarColorChanged() {
+    for (auto& scene : scenes_)
+        scene->onCarColorChanged();
 }

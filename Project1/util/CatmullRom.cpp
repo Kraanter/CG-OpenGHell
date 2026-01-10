@@ -1,5 +1,8 @@
 ﻿#include "CatmullRom.h"
 
+#include <algorithm>
+#include <cmath>
+
 CatmullRom::CatmullRom() {
     numPoints = 0;
     points = nullptr;
@@ -33,16 +36,26 @@ void CatmullRom::removePoint(int index) {
 int CatmullRom::getNumPoints() { return numPoints; }
 
 glm::vec2 CatmullRom::getDerivative(float t) {
-    int bezierIndex = t * numPoints;
+    if (numPoints == 0) { return glm::vec2(0.0f); }
+    if (t >= 1.0f) { t = std::fmod(t, 1.0f); }
+    if (t < 0.0f) { t = 0.0f; }
+    int bezierIndex = static_cast<int>(t * numPoints);
+    if (bezierIndex >= numPoints) { bezierIndex = numPoints - 1; }
     float localT = t * numPoints - bezierIndex;
+    localT = std::clamp(localT, 0.0f, 1.0f);
     return getTangent(localT, bezierIndex);
 }
 
 void CatmullRom::setTension(float t) { tension = t; }
 
 glm::vec2 CatmullRom::getPoint(float t) {
-    int bezierIndex = t * numPoints;
+    if (numPoints == 0) { return glm::vec2(0.0f); }
+    if (t >= 1.0f) { t = std::fmod(t, 1.0f); }
+    if (t < 0.0f) { t = 0.0f; }
+    int bezierIndex = static_cast<int>(t * numPoints);
+    if (bezierIndex >= numPoints) { bezierIndex = numPoints - 1; }
     float localT = t * numPoints - bezierIndex;
+    localT = std::clamp(localT, 0.0f, 1.0f);
     return getPoint(localT, bezierIndex);
 }
 

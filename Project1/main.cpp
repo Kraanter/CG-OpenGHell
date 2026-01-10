@@ -29,7 +29,7 @@ constexpr int WIDTH = 800, HEIGHT = 800;
 auto fragshader_name = "fragmentshader.frag";
 auto vertexshader_name = "vertexshader.vert";
 
-const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f);
+const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 5000.0f);
 
 constexpr unsigned int DELTA_TIME = 10;
 
@@ -59,6 +59,9 @@ LightSource light;
 //--------------------------------------------------------------------------------
 
 sceneManager stage_manager;
+bool isPaused = false;
+int windowWidth = WIDTH;
+int windowHeight = HEIGHT;
 
 //--------------------------------------------------------------------------------
 // Keyboard handling
@@ -68,7 +71,12 @@ void keyboardHandler(unsigned char key, int a, int b) {
     objectScene* scene = stage_manager.currentScene();
     switch (key) {
     case 27:
-        glutExit();
+        isPaused = !isPaused;
+        glutSetCursor(isPaused ? GLUT_CURSOR_LEFT_ARROW : GLUT_CURSOR_NONE);
+        glutSetWindowTitle(isPaused ? "Hello OpenGL - Paused" : "Hello OpenGL");
+        if (!isPaused) {
+            glutWarpPointer(windowWidth / 2, windowHeight / 2);
+        }
         break;
     case 'n':
         stage_manager.nextScene();
@@ -77,6 +85,10 @@ void keyboardHandler(unsigned char key, int a, int b) {
         stage_manager.clearVBO();
         scene->resetAndInit();
         stage_manager.bindVBO(program_id);
+        break;
+    case 'c':
+        app_data.nextCarColor();
+        stage_manager.onCarColorChanged();
         break;
     default:
         if (scene != nullptr) { scene->keyboardHandler(key); }
@@ -88,11 +100,9 @@ void keyboardHandler(unsigned char key, int a, int b) {
 // Mouse handling
 //--------------------------------------------------------------------------------
 
-int windowWidth = WIDTH;
-int windowHeight = HEIGHT;
-
 void mouseMoveHandler(int x, int y) {
     static bool warping = false;
+    if (isPaused) { return; }
     if (warping) {
         warping = false;
         return;
@@ -119,6 +129,11 @@ void mouseMoveHandler(int x, int y) {
 //--------------------------------------------------------------------------------
 
 void Render() {
+    static bool first = true;
+    if (first) {
+        std::cout << "[render] first frame" << std::endl;
+        first = false;
+    }
     // Define background
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -126,7 +141,7 @@ void Render() {
     // Attach to program_id
     glUseProgram(program_id);
     // Do transformations
-    stage_manager.render(light.position);
+    stage_manager.render(light.position, isPaused);
 
     // Swap buffers
     glutSwapBuffers();
@@ -160,7 +175,7 @@ void InitGlutGlew(int argc, char** argv) {
         glViewport(0, 0, w, h);
 
         stage_manager.fillUniformVars(
-            glm::perspective(glm::radians(45.0f), static_cast<float>(w) / static_cast<float>(h), 0.1f, 1000.0f),
+            glm::perspective(glm::radians(45.0f), static_cast<float>(w) / static_cast<float>(h), 0.1f, 5000.0f),
             light.position);
     });
     glutDisplayFunc(Render);
@@ -247,12 +262,19 @@ void getAllCars(ApplicationData* appData) {
 
 int main(int argc, char** argv) {
     srand(time(nullptr));
+    std::cout << "[init] InitGlutGlew" << std::endl;
     InitGlutGlew(argc, argv);
+    std::cout << "[init] InitShaders" << std::endl;
     InitShaders();
+    std::cout << "[init] getAllCars" << std::endl;
     getAllCars(&app_data);
+    std::cout << "[init] InitScenes" << std::endl;
     InitScenes(&app_data);
+    std::cout << "[init] InitMaterialsLight" << std::endl;
     InitMaterialsLight();
+    std::cout << "[init] InitBuffers" << std::endl;
     InitBuffers();
+    std::cout << "[init] entering main loop" << std::endl;
 
     // Hide console window
     HWND hWnd = GetConsoleWindow();

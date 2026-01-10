@@ -15,6 +15,16 @@ struct ApplicationData {
     unsigned selectedCar;
     std::vector<std::tuple<std::string, std::string>> carFiles;
     GLuint program_id;
+    unsigned selectedCarColor = 0;
+    std::vector<glm::vec3> carColors = {
+        glm::vec3(0.85f, 0.1f, 0.1f),
+        glm::vec3(0.1f, 0.35f, 0.9f),
+        glm::vec3(0.1f, 0.75f, 0.25f),
+        glm::vec3(0.95f, 0.8f, 0.1f),
+        glm::vec3(0.9f, 0.4f, 0.1f),
+        glm::vec3(0.7f, 0.2f, 0.85f),
+        glm::vec3(0.8f, 0.8f, 0.8f),
+    };
 
     std::string getSelectedCarObj() const {
         auto carFile = std::get<0>(this->carFiles[selectedCar]);
@@ -24,6 +34,14 @@ struct ApplicationData {
     }
 
     std::string getSelectedCarTxt() { return std::get<1>(carFiles[selectedCar]); }
+    glm::vec3 getSelectedCarColor() const {
+        if (carColors.empty()) { return glm::vec3(0.8f, 0.8f, 0.8f); }
+        return carColors[selectedCarColor % carColors.size()];
+    }
+    void nextCarColor() {
+        if (carColors.empty()) { return; }
+        selectedCarColor = (selectedCarColor + 1) % carColors.size();
+    }
 };
 
 struct Material {
@@ -86,6 +104,7 @@ public:
 class objectScene {
 public:
     unsigned getNumObjects() { return num_objects; }
+    unsigned getSelectedCarId() const { return appData->selectedCar; }
 
     virtual glm::vec3 startCameraPos() { return glm::vec3(1.0, 1.0, 0.0); }
 
@@ -133,8 +152,13 @@ public:
     objectScene(ApplicationData* appData);
     object* addObject(const char* obj_path, const char* txt_path, Material* material, bool visible = true);
     object* addObject(objectData data, Material* material, bool visible = true);
+    object* addGroundPlane(float size = 100.0f,
+                           const char* texture_path = "textures/colormap_flip.bmp",
+                           float uv_scale = 10.0f);
     virtual void preRenderCallback(glm::vec3 light_pos) {}
-    void render(glm::vec3 light_pos);
+    virtual void onSelectedCarChanged() {}
+    virtual void onCarColorChanged() {}
+    void render(glm::vec3 light_pos, bool paused = false);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
     Material* createMaterial();
 

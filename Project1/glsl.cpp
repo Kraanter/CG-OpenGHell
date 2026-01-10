@@ -6,6 +6,9 @@ char* glsl::readFile(const char* filename)
 {
     // Open the file
     FILE* fp = fopen(filename, "r");
+    if (fp == nullptr) {
+        return nullptr;
+    }
     // Move the file pointer to the end of the file and determing the length
     fseek(fp, 0, SEEK_END);
     long file_length = ftell(fp);
@@ -19,7 +22,7 @@ char* glsl::readFile(const char* filename)
     // Here's the actual read
     fread(contents, 1, file_length, fp);
     // This is how you denote the end of a string in C
-    contents[file_length + 1] = '\0';
+    contents[file_length] = '\0';
     fclose(fp);
     return contents;
 }
@@ -37,7 +40,7 @@ bool glsl::compiledStatus(GLint shaderID)
         char* msgBuffer = new char[logLength];
         glGetShaderInfoLog(shaderID, logLength, NULL, msgBuffer);
         printf("%s\n", msgBuffer);
-        delete (msgBuffer);
+        delete[] msgBuffer;
         return false;
     }
 }
