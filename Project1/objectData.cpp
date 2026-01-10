@@ -36,7 +36,7 @@ objectData::objectData(const char* obj_path, const char* txt_path) {
 void objectData::setTexture(const char* txt_path) {
     if (txt_cache.find(txt_path) != txt_cache.end()) { texture_id = txt_cache.at(txt_path); }
     else {
-        texture_id = loadBMP(txt_path);
+        texture_id = loadTexture(txt_path);
         txt_cache[txt_path] = texture_id;
     }
 }

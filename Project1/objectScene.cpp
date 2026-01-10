@@ -1,5 +1,6 @@
 ﻿#include "objectScene.h"
 
+#include <algorithm>
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -42,6 +43,11 @@ glm::vec3 objectScene::calculateDirectionVector(bool withVertical) {
     return createVector(cameraAlpha, cameraBeta);
 }
 
+void objectScene::rotateCamera(float deltaAlpha, float deltaBeta) {
+    cameraAlpha += deltaAlpha;
+    cameraBeta = std::clamp(cameraBeta + deltaBeta, -1.5f, 1.5f);
+}
+
 object::object(objectData data, Material* material) : data(data), material(material), modelSpace(ModelSpace()) {}
 
 void object::bindVBO(GLuint program_id) { data.bindVBO(program_id); }
@@ -53,6 +59,9 @@ void object::render(const UniformVars* uVars, const glm::mat4* view, glm::vec3 l
     glUniform3fv(uVars->uniform_material_diffuse, 1, value_ptr(material->diffuse_color));
     glUniform3fv(uVars->uniform_specular, 1, value_ptr(material->specular_color));
     glUniform1f(uVars->uniform_material_power, material->power);
+    glUniform1i(uVars->uniform_texture_only, material->use_texture_only ? 1 : 0);
+    glUniform1i(uVars->uniform_panorama, material->use_panorama ? 1 : 0);
+    glUniform1i(uVars->uniform_toon, material->use_toon ? 1 : 0);
     glUniformMatrix4fv(uVars->uniform_mv, 1, GL_FALSE, value_ptr(mv));
 
     glBindVertexArray(data.vao);
@@ -78,7 +87,7 @@ void objectScene::clearVBO() {
 objectScene::objectScene(ApplicationData* app_data) {
     this->appData = app_data;
     objectScene::resetAndInit();
-    skyboxRef = new skybox(5);
+    skyboxRef = new skybox(500, "textures/Skybox.png");
 };
  
 object* objectScene::addObject(const char* obj_path, const char* txt_path, Material* material, bool visible) {
@@ -100,6 +109,7 @@ object* objectScene::addObject(objectData data, Material* material, bool visible
 void objectScene::render(glm::vec3 light_pos) {
     preRenderCallback(light_pos);
     glm::mat4 view = currentViewMat();
+    skyboxRef->objectRef->modelSpace.setLocation(cameraPos);
     skyboxRef->objectRef->render(uniform_vars, &view, light_pos);
     for (auto& obj : objects)
         if (obj.visible) {
@@ -112,6 +122,7 @@ void objectScene::setUniformVars(UniformVars* uniform_vars, const GLuint program
     this->uniform_vars = uniform_vars;
     appData->program_id = program_id;
 
+    skyboxRef->objectRef->bindVBO(program_id);
     for (auto& obj : objects)
         obj.bindVBO(program_id);
 }

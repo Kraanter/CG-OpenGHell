@@ -119,7 +119,9 @@ void carScene::reloadScene() {
 }
 
 object* carScene::addCar(const char* car_path, const char* texture_path) {
-    auto addedCar = addObject(car_path, texture_path, createMaterial(), true);
+    auto* carMaterial = createMaterial();
+    carMaterial->use_toon = true;
+    auto addedCar = addObject(car_path, texture_path, carMaterial, true);
     addedCar->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.008f);
     return addedCar;
 }

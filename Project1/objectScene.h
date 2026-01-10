@@ -31,6 +31,9 @@ struct Material {
     glm::vec3 diffuse_color;
     glm::vec3 specular_color;
     float power;
+    bool use_texture_only = false;
+    bool use_panorama = false;
+    bool use_toon = false;
 };
 
 class ModelSpace {
@@ -60,6 +63,9 @@ struct UniformVars {
     GLuint uniform_material_diffuse;
     GLuint uniform_specular;
     GLuint uniform_material_power;
+    GLuint uniform_texture_only;
+    GLuint uniform_panorama;
+    GLuint uniform_toon;
 };
 
 class object {
@@ -119,6 +125,7 @@ public:
 
     void clearVBO();
     glm::vec3 calculateDirectionVector(bool withVertical);
+    void rotateCamera(float deltaAlpha, float deltaBeta);
 
     glm::vec3 cameraPos = startCameraPos();
     std::vector<object> objects = std::vector<object>();

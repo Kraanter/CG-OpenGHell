@@ -11,6 +11,7 @@ in vec3 normal;
 
 in vec2 uv;
 out vec2 UV;
+out vec3 sky_dir;
 
 // Outputs
 out VS_OUT
@@ -36,6 +37,7 @@ void main()
 
     // Calculate the clip-space position of each vertex
     gl_Position = projection * P;
-    
+
     UV = uv;
+    sky_dir = normalize(position);
 }

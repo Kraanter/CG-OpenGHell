@@ -2,13 +2,16 @@
 
 #include "objectData.h"
 #include "objectScene.h"
+#include "texture.h"
 
-skybox::skybox(int size) {
-    objectRef = createSkyboxData(size);
+#include <array>
+
+skybox::skybox(int size, const char* texture_path) {
+    objectRef = createSkyboxData(size, texture_path);
     objectRef->visible = true;
 }
 
-object* skybox::createSkyboxData(int size) {
+object* skybox::createSkyboxData(int size, const char* texture_path) {
     objectData data;
     float s = static_cast<float>(size);
 
@@ -41,32 +44,47 @@ object* skybox::createSkyboxData(int size) {
 
     data.vertices = vertices;
 
-    // Simple UV coordinates
-    std::vector<glm::vec2> uvs = {
-        // Front face
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f),
-
-        // Back face
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f),
-
-        // Right face
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f),
-
-        // Left face
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f),
-
-        // Top face
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f),
-
-        // Bottom face
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f),
+    // UVs for a left-sided cross layout (4x3). Order per face matches vertices.
+    const float stepU = 1.0f / 4.0f;
+    const float stepV = 1.0f / 3.0f;
+    auto uvRect = [stepU, stepV](int col, int row) {
+        float u0 = col * stepU;
+        float v0 = row * stepV;
+        float u1 = u0 + stepU;
+        float v1 = v0 + stepV;
+        return std::array<glm::vec2, 6>{
+            glm::vec2(u0, v0), glm::vec2(u1, v0), glm::vec2(u1, v1),
+            glm::vec2(u0, v0), glm::vec2(u1, v1), glm::vec2(u0, v1),
+        };
     };
+
+    auto uvRectFlipH = [stepU, stepV](int col, int row) {
+        float u0 = col * stepU;
+        float v0 = row * stepV;
+        float u1 = u0 + stepU;
+        float v1 = v0 + stepV;
+        return std::array<glm::vec2, 6>{
+            glm::vec2(u1, v0), glm::vec2(u0, v0), glm::vec2(u0, v1),
+            glm::vec2(u1, v0), glm::vec2(u0, v1), glm::vec2(u1, v1),
+        };
+    };
+
+    // Layout (row 0 at bottom): left, front, right, back on middle row
+    auto front = uvRect(1, 1);
+    auto back = uvRectFlipH(3, 1);
+    auto right = uvRect(2, 1);
+    auto left = uvRect(0, 1);
+    auto topFace = uvRect(1, 2);
+    auto bottomFace = uvRect(1, 0);
+
+    std::vector<glm::vec2> uvs;
+    uvs.reserve(vertices.size());
+    uvs.insert(uvs.end(), front.begin(), front.end());
+    uvs.insert(uvs.end(), back.begin(), back.end());
+    uvs.insert(uvs.end(), right.begin(), right.end());
+    uvs.insert(uvs.end(), left.begin(), left.end());
+    uvs.insert(uvs.end(), topFace.begin(), topFace.end());
+    uvs.insert(uvs.end(), bottomFace.begin(), bottomFace.end());
     data.uvs = uvs;
 
     // Calculate normals for each face
@@ -80,14 +98,24 @@ object* skybox::createSkyboxData(int size) {
     }
     data.normals = normals;
 
+    if (texture_path != nullptr) {
+        data.setTexture(texture_path);
+    } else {
+        data.texture_id = createSolidTexture(173, 216, 230);
+    }
+
     return new object(data, createMaterial());
 }
 
 Material* skybox::createMaterial() {
-    const auto material = new Material();
-    material->ambient_color = glm::vec3(0.2, 0.2, 0.1);
-    material->diffuse_color = glm::vec3(0.5, 0.5, 0.3);
-    material->specular_color = glm::vec3(0.5, 0.5, 0.5);
-    material->power = 50.0;
+    auto* material = new Material();
+
+    // Skybox should not be affected by lights
+    material->ambient_color = glm::vec3(0.0f);
+    material->diffuse_color = glm::vec3(0.0f); // no diffuse lighting
+    material->specular_color = glm::vec3(0.0f); // no specular highlights
+    material->power = 1.0f;
+    material->use_texture_only = true;
+
     return material;
 }

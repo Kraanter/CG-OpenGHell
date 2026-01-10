@@ -57,8 +57,10 @@ void trackScene::resetAndInit() {
     object* house = addObject("Objects/Eigen/exports/osso.obj", "textures/colormap_flip.bmp", createMaterial());
     house->modelSpace.translate(glm::vec3(10.0, 0.0, 0.0))->rotate(glm::radians(90.0f), glm::vec3(0.0, -1.0, 0.0));
 
+    auto* carMaterial = createMaterial();
+    carMaterial->use_toon = true;
     object* car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(),
-                            createMaterial());
+                            carMaterial);
     car->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.013f);
 
     for (unsigned i = 0; i < COUNT; i++) {

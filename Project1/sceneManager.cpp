@@ -19,6 +19,9 @@ void sceneManager::bindVBO(GLuint program_id) {
     uniform_vars.uniform_material_diffuse = glGetUniformLocation(program_id, "mat_diffuse");
     uniform_vars.uniform_specular = glGetUniformLocation(program_id, "mat_specular");
     uniform_vars.uniform_material_power = glGetUniformLocation(program_id, "mat_power");
+    uniform_vars.uniform_texture_only = glGetUniformLocation(program_id, "use_texture_only");
+    uniform_vars.uniform_panorama = glGetUniformLocation(program_id, "use_panorama");
+    uniform_vars.uniform_toon = glGetUniformLocation(program_id, "use_toon");
 
     // Set the uniform variables for all scenes
     for (auto& scene : scenes_)

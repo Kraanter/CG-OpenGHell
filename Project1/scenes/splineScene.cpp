@@ -82,7 +82,9 @@ void splineScene::resetAndInit() {
     trackSpline = generateTrackSpline();
     compileTrack();
 
-    car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(), createMaterial(), true);
+    auto* carMaterial = createMaterial();
+    carMaterial->use_toon = true;
+    car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(), carMaterial, true);
     car->modelSpace.scale(0.001f);
 }
 

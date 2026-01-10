@@ -19,10 +19,7 @@ void gradingScene::initScene() {
 
     addObject("Objects/Eigen/exports/plateau.obj", "textures/Yellobrk.bmp", createMaterial());
 
-    // Add a cube
-    skybox newSkybox(5);
-
-    addObject(newSkybox.objectRef->data, createMaterial(), true);
+    // Skybox is handled by objectScene.
 }
 
 object* gradingScene::getSelectedObj() {
@@ -40,17 +37,17 @@ void gradingScene::incrementObjSelection(int num) {
 }
 
 void gradingScene::keyboardHandler(unsigned char key) {
-    float kokosnoot = (sin(((frameTicker) / 10) / glm::pi<float>()) / 10);
+    float change = ((((frameTicker) / 10) / glm::pi<float>()) / 10);
     switch (key) {
     case ' ':
         gradingScene::resetAndInit();
         break;
     case '+':
-        getSelectedObj()->modelSpace.translate(glm::vec3(0, 0 - kokosnoot, 0));
+        getSelectedObj()->modelSpace.translate(glm::vec3(0, 0 - change, 0));
         incrementObjSelection(1);
         break;
     case '-':
-        getSelectedObj()->modelSpace.translate(glm::vec3(0, -kokosnoot, 0));
+        getSelectedObj()->modelSpace.translate(glm::vec3(0, -change, 0));
         incrementObjSelection(-1);
         break;
     case 'i':

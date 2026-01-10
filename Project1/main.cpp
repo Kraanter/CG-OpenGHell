@@ -12,7 +12,10 @@
 #include "glsl.h"
 #include "objectScene.h"
 #include "sceneManager.h"
+#include "scenes/carScene.h"
 #include "scenes/gradingScene.h"
+#include "scenes/splineScene.h"
+#include "scenes/trackScene.h"
 
 using namespace std;
 
@@ -81,6 +84,35 @@ void keyboardHandler(unsigned char key, int a, int b) {
     }
 }
 
+//--------------------------------------------------------------------------------
+// Mouse handling
+//--------------------------------------------------------------------------------
+
+int windowWidth = WIDTH;
+int windowHeight = HEIGHT;
+
+void mouseMoveHandler(int x, int y) {
+    static bool warping = false;
+    if (warping) {
+        warping = false;
+        return;
+    }
+
+    int centerX = windowWidth / 2;
+    int centerY = windowHeight / 2;
+    int dx = x - centerX;
+    int dy = y - centerY;
+
+    const float sensitivity = 0.005f;
+    objectScene* scene = stage_manager.currentScene();
+    if (scene != nullptr) {
+        scene->rotateCamera(-static_cast<float>(dx) * sensitivity, -static_cast<float>(dy) * sensitivity);
+    }
+
+    warping = true;
+    glutWarpPointer(centerX, centerY);
+}
+
 
 //--------------------------------------------------------------------------------
 // Rendering
@@ -123,6 +155,8 @@ void InitGlutGlew(int argc, char** argv) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Hello OpenGL");
     glutReshapeFunc([](int w, int h) {
+        windowWidth = w;
+        windowHeight = h;
         glViewport(0, 0, w, h);
 
         stage_manager.fillUniformVars(
@@ -131,12 +165,16 @@ void InitGlutGlew(int argc, char** argv) {
     });
     glutDisplayFunc(Render);
     glutKeyboardFunc(keyboardHandler);
+    glutPassiveMotionFunc(mouseMoveHandler);
     glutTimerFunc(DELTA_TIME, Render, 0);
 
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     glewInit();
+
+    glutSetCursor(GLUT_CURSOR_NONE);
+    glutWarpPointer(windowWidth / 2, windowHeight / 2);
 }
 
 
@@ -161,9 +199,9 @@ void InitShaders() {
 //------------------------------------------------------------
 void InitScenes(ApplicationData* app_data) {
     stage_manager.addScene(new gradingScene(app_data));
-    // stage_manager.addScene(new trackScene(app_data));
-    // stage_manager.addScene(new carScene(app_data));
-    // stage_manager.addScene(new splineScene(app_data));
+    stage_manager.addScene(new trackScene(app_data));
+    stage_manager.addScene(new carScene(app_data));
+    stage_manager.addScene(new splineScene(app_data));
 }
 
 
@@ -176,7 +214,7 @@ void InitMaterialsLight() { light.position = glm::vec3(4.0, 4.0, 4.0); }
 //------------------------------------------------------------
 // void InitBuffers()
 // Allocates and fills buffers
-//------------------------------------------------------------ 
+//------------------------------------------------------------
 void InitBuffers() {
     stage_manager.bindVBO(program_id);
 
@@ -211,7 +249,7 @@ int main(int argc, char** argv) {
     srand(time(nullptr));
     InitGlutGlew(argc, argv);
     InitShaders();
-    // getAllCars(&app_data);
+    getAllCars(&app_data);
     InitScenes(&app_data);
     InitMaterialsLight();
     InitBuffers();

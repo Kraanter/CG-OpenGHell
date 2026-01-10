@@ -6,8 +6,8 @@ class object;
 class skybox {
 public:
     object* objectRef;
-    skybox(int size);
-    object* createSkyboxData(int size);
+    skybox(int size, const char* texture_path = nullptr);
+    object* createSkyboxData(int size, const char* texture_path);
 
 protected:
     static Material* createMaterial();

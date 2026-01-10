@@ -4,6 +4,12 @@
 
 #include <GL/glew.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 GLuint loadBMP(const char * imagepath) {
 
@@ -73,6 +79,50 @@ GLuint loadBMP(const char * imagepath) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     // Return the ID of the texture we just created
+    return textureID;
+}
+
+GLuint createSolidTexture(unsigned char r, unsigned char g, unsigned char b) {
+    GLuint textureID;
+    unsigned char data[3] = { r, g, b };
+
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    return textureID;
+}
+
+GLuint loadPNG(const char* imagepath) {
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    unsigned char* data = stbi_load(imagepath, &width, &height, &channels, 0);
+    if (data == nullptr) {
+        printf("%s could not be opened. %s\n", imagepath, stbi_failure_reason());
+        return 0;
+    }
+
+    GLenum format = GL_RGB;
+    if (channels == 4) {
+        format = GL_RGBA;
+    } else if (channels == 1) {
+        format = GL_RED;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+    stbi_image_free(data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
     return textureID;
 }
 
@@ -198,4 +248,22 @@ GLuint loadDDS(const char * imagepath) {
     return textureID;
 
 
+}
+
+static std::string toLower(const char* input) {
+    std::string out = input;
+    std::transform(out.begin(), out.end(), out.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    return out;
+}
+
+GLuint loadTexture(const char* imagepath) {
+    std::string path = toLower(imagepath);
+    if (path.rfind(".png") == path.size() - 4) {
+        return loadPNG(imagepath);
+    }
+    if (path.rfind(".dds") == path.size() - 4) {
+        return loadDDS(imagepath);
+    }
+    return loadBMP(imagepath);
 }
