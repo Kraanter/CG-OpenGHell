@@ -15,6 +15,7 @@ public:
         if (sceneNr < scenes_.size())
             current_scene_ = sceneNr;
     }
+    unsigned currentSceneIndex() const { return current_scene_; }
 
     void nextScene() {
         current_scene_++;
@@ -25,6 +26,8 @@ public:
     void fillUniformVars(glm::mat4 projection, glm::vec3 light_pos);
     void bindVBO(GLuint program_id);
     void clearVBO();
+    void resetScene(unsigned sceneIndex);
+    void resetAllScenes();
 
     sceneManager();
     std::vector<objectScene*> scenes_;

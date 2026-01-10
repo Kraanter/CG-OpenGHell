@@ -10,6 +10,7 @@ public:
     object* addGround();
     void resetAndInit() override;
     void preRenderCallback(glm::vec3 light_pos) override;
+    std::vector<std::string> getHudLines() const override;
 
 private:
     float upnertia = 0.0f;
@@ -17,4 +18,6 @@ private:
     glm::vec2 prevCameraAngles;
     bool isFlying = false;
     void updateInertia();
+    object* car = nullptr;
+    bool cameraInitialized = false;
 };

@@ -12,6 +12,7 @@ public:
     void resetAndInit() override;
     void onSelectedCarChanged() override;
     void onCarColorChanged() override;
+    std::vector<std::string> getHudLines() const override;
     unsigned selectedCarId() { return appData->selectedCar; }
 
 private:

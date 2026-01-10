@@ -159,6 +159,8 @@ public:
     virtual void preRenderCallback(glm::vec3 light_pos) {}
     virtual void onSelectedCarChanged() {}
     virtual void onCarColorChanged() {}
+    virtual std::vector<std::string> getHudLines() const { return {}; }
+    virtual bool getLightPosition(glm::vec3& outPos) const { return false; }
     void render(glm::vec3 light_pos, bool paused = false);
     void setUniformVars(UniformVars* uniform_vars, GLuint program_id);
     Material* createMaterial();

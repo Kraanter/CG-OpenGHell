@@ -9,6 +9,8 @@ public:
     void keyboardHandler(unsigned char key) override;
     void resetAndInit() override;
     void preRenderCallback(glm::vec3 light_pos) override;
+    std::vector<std::string> getHudLines() const override;
+    bool getLightPosition(glm::vec3& outPos) const override;
     void onSelectedCarChanged() override;
     void onCarColorChanged() override;
     splineScene(ApplicationData* appData);

@@ -147,6 +147,14 @@ void objectScene::render(glm::vec3 light_pos, bool paused) {
         preRenderCallback(light_pos);
     }
     glm::mat4 view = currentViewMat();
+    glm::vec3 sceneLight = light_pos;
+    if (getLightPosition(sceneLight)) {
+        glm::vec3 lightView = glm::vec3(view * glm::vec4(sceneLight, 1.0f));
+        glUniform3fv(uniform_vars->uniform_light_pos, 1, value_ptr(lightView));
+    } else {
+        glm::vec3 lightView = normalize(glm::vec3(0.2f, 1.0f, 0.3f)) * 10000.0f;
+        glUniform3fv(uniform_vars->uniform_light_pos, 1, value_ptr(lightView));
+    }
     skyboxRef->objectRef->modelSpace.setLocation(cameraPos);
     skyboxRef->objectRef->render(uniform_vars, &view, light_pos);
     for (auto& obj : objects)

@@ -29,6 +29,7 @@ auto fragshader_name = "fragmentshader.frag";
 auto vertexshader_name = "vertexshader.vert";
 
 const auto startProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 5000.0f);
+glm::mat4 currentProjection = startProjection;
 
 constexpr unsigned int DELTA_TIME = 10;
 
@@ -80,10 +81,26 @@ void keyboardHandler(unsigned char key, int a, int b) {
     case 'n':
         stage_manager.nextScene();
         break;
+    case 13: // Enter
+        if (stage_manager.currentSceneIndex() == 1) {
+            stage_manager.resetScene(0);
+            stage_manager.setSelectedScene(0);
+        }
+        break;
+    case 'f':
+        if (stage_manager.currentSceneIndex() == 0) {
+            stage_manager.resetScene(2);
+            stage_manager.setSelectedScene(2);
+        }
+        break;
+    case 'm':
+        if (stage_manager.currentSceneIndex() == 0) {
+            stage_manager.resetScene(1);
+            stage_manager.setSelectedScene(1);
+        }
+        break;
     case 'r':
-        stage_manager.clearVBO();
-        scene->resetAndInit();
-        stage_manager.bindVBO(program_id);
+        stage_manager.resetAllScenes();
         break;
     case 'c':
         app_data.nextCarColor();
@@ -127,6 +144,33 @@ void mouseMoveHandler(int x, int y) {
 // Rendering
 //--------------------------------------------------------------------------------
 
+void drawTextWithOutline(int x, int y, const std::string& text) {
+    glUseProgram(0);
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glWindowPos2i(x - 1, y - 1);
+    for (char c : text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+    }
+    glWindowPos2i(x + 1, y - 1);
+    for (char c : text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+    }
+    glWindowPos2i(x - 1, y + 1);
+    for (char c : text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+    }
+    glWindowPos2i(x + 1, y + 1);
+    for (char c : text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+    }
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glWindowPos2i(x, y);
+    for (char c : text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+    }
+}
+
 void Render() {
     static bool first = true;
     if (first) {
@@ -141,6 +185,22 @@ void Render() {
     glUseProgram(program_id);
     // Do transformations
     stage_manager.render(light.position, isPaused);
+
+    glDisable(GL_DEPTH_TEST);
+    if (isPaused) {
+        drawTextWithOutline(20, HEIGHT - 30, "Paused - press Esc to resume");
+    } else {
+        objectScene* scene = stage_manager.currentScene();
+        if (scene != nullptr) {
+            auto lines = scene->getHudLines();
+            int y = 90;
+            for (const auto& line : lines) {
+                drawTextWithOutline(20, y, line);
+                y -= 20;
+            }
+        }
+    }
+    glEnable(GL_DEPTH_TEST);
 
     // Swap buffers
     glutSwapBuffers();
@@ -173,9 +233,10 @@ void InitGlutGlew(int argc, char** argv) {
         windowHeight = h;
         glViewport(0, 0, w, h);
 
-        stage_manager.fillUniformVars(
-            glm::perspective(glm::radians(45.0f), static_cast<float>(w) / static_cast<float>(h), 0.1f, 5000.0f),
-            light.position);
+        currentProjection = glm::perspective(glm::radians(45.0f),
+                                             static_cast<float>(w) / static_cast<float>(h),
+                                             0.1f, 5000.0f);
+        stage_manager.fillUniformVars(currentProjection, light.position);
     });
     glutDisplayFunc(Render);
     glutKeyboardFunc(keyboardHandler);

@@ -42,9 +42,17 @@ object* trackScene::addGround() {
 
 void trackScene::resetAndInit() {
     objectScene::resetAndInit();
-    cameraPos = startCameraPos();
-    prevCameraPos = startCameraPos();
-    prevCameraPos.y = 10.0f;
+    objects.clear();
+    num_objects = 0;
+    car = nullptr;
+    if (!cameraInitialized) {
+        cameraPos = startCameraPos();
+        cameraAlpha = glm::half_pi<float>();
+        cameraBeta = 0.0f;
+        prevCameraPos = cameraPos;
+        prevCameraPos.y = 10.0f;
+        cameraInitialized = true;
+    }
 
     object* ground = addGround();
     ground->modelSpace.scale(GROUND_SIZE);
@@ -60,8 +68,8 @@ void trackScene::resetAndInit() {
     auto* carMaterial = createMaterial();
     carMaterial->use_toon = true;
     carMaterial->diffuse_color = appData->getSelectedCarColor();
-    object* car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(),
-                            carMaterial);
+    car = addObject(appData->getSelectedCarObj().c_str(), appData->getSelectedCarTxt().c_str(),
+                    carMaterial);
     car->modelSpace.translate(glm::vec3(0.0, 0.147, 0.0))->scale(0.013f);
 
     for (unsigned i = 0; i < COUNT; i++) {
@@ -132,3 +140,22 @@ void trackScene::keyboardHandler(unsigned char key) {
 void trackScene::preRenderCallback(glm::vec3 light_pos) { updateInertia(); }
 
 trackScene::trackScene(ApplicationData* app_data): objectScene(app_data) { trackScene::resetAndInit(); }
+
+std::vector<std::string> trackScene::getHudLines() const {
+    if (isFlying) {
+        return {
+            "Drone mode: WASD move, mouse look",
+            "QE to go up and down",
+            "V to switch to walk mode",
+            "F to enter car",
+            "M to change car"
+        };
+    }
+    return {
+        "Walk mode: WASD move, mouse look",
+        "Space to jump",
+        "V to switch to drone mode",
+        "F to enter car",
+        "M to change car"
+    };
+}

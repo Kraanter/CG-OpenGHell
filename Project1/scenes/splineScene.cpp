@@ -10,37 +10,10 @@ glm::vec3 splineScene::startCameraPos() { return glm::vec3(0.1f, 10.0f, 0.0f); }
 
 void splineScene::keyboardHandler(unsigned char key) {
     switch (key) {
-    case ' ':
-        lockedCamera = !lockedCamera;
-        break;
-    case 'l':
-        // cameraRotationHor += 0.1f;
-        // centerPos = calcCenterPos();
-        break;
-    case 'j':
-        // cameraRotationHor -= 0.1f;
-        // centerPos = calcCenterPos();
-        break;
-    case 'i':
-        // cameraRotationVer += 0.1f;
-        // centerPos = calcCenterPos();
-        break;
-    case 'k':
-        // cameraRotationVer -= 0.1f;
-        // centerPos = calcCenterPos();
-        break;
-    case 'e':
-        cameraPos.y += 1.0f;
-        break;
-    case 'q':
-        if (cameraPos.y - 1.0f < 0) { return; }
-        cameraPos.y -= 1.0f;
-        break;
     case 'p':
         inCarView = !inCarView;
         break;
     default:
-        objectScene::keyboardHandler(key);
         break;
     }
 }
@@ -96,7 +69,11 @@ void splineScene::preRenderCallback(glm::vec3 light_pos) {
 
 void splineScene::resetAndInit() {
     objectScene::resetAndInit();
+    objects.clear();
+    num_objects = 0;
+    car = nullptr;
     cameraPos = startCameraPos();
+    lockedCamera = true;
 
     std::cout << "[spline] resetAndInit start" << std::endl;
     addGroundPlane(2000.0f);
@@ -115,6 +92,17 @@ void splineScene::resetAndInit() {
     carPos.y = 0.25f;
     carYaw = 0.0f;
     std::cout << "[spline] resetAndInit done" << std::endl;
+}
+
+std::vector<std::string> splineScene::getHudLines() const {
+    return {
+        "Drive: P toggle view"
+    };
+}
+
+bool splineScene::getLightPosition(glm::vec3& outPos) const {
+    outPos = carPos + glm::vec3(0.0f, 6.25f, 0.0f);
+    return true;
 }
 
 #define TRACKWIDTH 3.0f

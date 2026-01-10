@@ -70,6 +70,8 @@ void carScene::updateCameraPos() {
 
 void carScene::resetAndInit() {
     objectScene::resetAndInit();
+    objects.clear();
+    num_objects = 0;
     camRadius = 6;
     camHeight = 2;
     camPercentage = 0.25;
@@ -142,4 +144,11 @@ void carScene::onSelectedCarChanged() {
     if (car != nullptr) {
         car->material->diffuse_color = appData->getSelectedCarColor();
     }
+}
+
+std::vector<std::string> carScene::getHudLines() const {
+    return {
+        "Car Select: use ,/. to change car, C to change color",
+        "WASD to move around and QE to change height. Enter to return"
+    };
 }

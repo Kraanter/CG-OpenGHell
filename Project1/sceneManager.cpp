@@ -53,3 +53,18 @@ void sceneManager::onCarColorChanged() {
     for (auto& scene : scenes_)
         scene->onCarColorChanged();
 }
+
+void sceneManager::resetScene(unsigned sceneIndex) {
+    if (sceneIndex >= scenes_.size()) { return; }
+    scenes_[sceneIndex]->clearVBO();
+    scenes_[sceneIndex]->resetAndInit();
+    scenes_[sceneIndex]->setUniformVars(&uniform_vars, program_id);
+}
+
+void sceneManager::resetAllScenes() {
+    for (auto& scene : scenes_) {
+        scene->clearVBO();
+        scene->resetAndInit();
+        scene->setUniformVars(&uniform_vars, program_id);
+    }
+}
