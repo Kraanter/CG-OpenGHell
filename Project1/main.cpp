@@ -172,11 +172,6 @@ void drawTextWithOutline(int x, int y, const std::string& text) {
 }
 
 void Render() {
-    static bool first = true;
-    if (first) {
-        std::cout << "[render] first frame" << std::endl;
-        first = false;
-    }
     // Define background
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -321,19 +316,12 @@ void getAllCars(ApplicationData* appData) {
 
 int main(int argc, char** argv) {
     srand(time(nullptr));
-    std::cout << "[init] InitGlutGlew" << std::endl;
     InitGlutGlew(argc, argv);
-    std::cout << "[init] InitShaders" << std::endl;
     InitShaders();
-    std::cout << "[init] getAllCars" << std::endl;
     getAllCars(&app_data);
-    std::cout << "[init] InitScenes" << std::endl;
     InitScenes(&app_data);
-    std::cout << "[init] InitMaterialsLight" << std::endl;
     InitMaterialsLight();
-    std::cout << "[init] InitBuffers" << std::endl;
     InitBuffers();
-    std::cout << "[init] entering main loop" << std::endl;
 
     // Hide console window
     HWND hWnd = GetConsoleWindow();

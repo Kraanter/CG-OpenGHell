@@ -75,13 +75,9 @@ void splineScene::resetAndInit() {
     cameraPos = startCameraPos();
     lockedCamera = true;
 
-    std::cout << "[spline] resetAndInit start" << std::endl;
     addGroundPlane(2000.0f);
-    std::cout << "[spline] generating track spline" << std::endl;
     trackSpline = generateTrackSpline();
-    std::cout << "[spline] compiling track mesh" << std::endl;
     compileTrack();
-    std::cout << "[spline] track mesh compiled" << std::endl;
 
     auto* carMaterial = createMaterial();
     carMaterial->use_toon = true;
@@ -91,7 +87,6 @@ void splineScene::resetAndInit() {
     carPos = currentTrackPos();
     carPos.y = 0.25f;
     carYaw = 0.0f;
-    std::cout << "[spline] resetAndInit done" << std::endl;
 }
 
 std::vector<std::string> splineScene::getHudLines() const {
@@ -115,7 +110,6 @@ void splineScene::compileTrack() {
     objectData data;
     data.setTexture("textures/track.bmp");
 
-    std::cout << "[spline] compileTrack samples=" << numPoints << std::endl;
     auto first = trackSpline.getPoint(1.0f / numPoints);
     glm::vec2 last = first;
 
@@ -198,7 +192,6 @@ void splineScene::compileTrack() {
         });
     }
 
-    std::cout << "[spline] track triangles=" << data.vertices.size() / 3 << std::endl;
     addObject(data, createMaterial());
 }
 
@@ -280,7 +273,6 @@ CatmullRom splineScene::generateTrackSpline() {
         points[i] = glm::vec2(x, y);
     }
     spline.setPoints(points, controlPoints);
-    std::cout << "[spline] control points=" << controlPoints << std::endl;
 
     return spline;
 }
