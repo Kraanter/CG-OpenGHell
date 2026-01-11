@@ -62,7 +62,12 @@ void trackScene::resetAndInit() {
         obj->modelSpace.translate(glm::vec3(-6, 0.2, i * 8.0 - COUNT));
     }
 
-    object* house = addObject("Objects/Eigen/exports/osso.obj", "textures/colormap_flip.bmp", createMaterial());
+    auto* houseMaterial = createMaterial();
+    houseMaterial->ambient_color = glm::vec3(0.25f, 0.25f, 0.25f);
+    houseMaterial->diffuse_color = glm::vec3(0.7f, 0.7f, 0.7f);
+    houseMaterial->specular_color = glm::vec3(0.8f, 0.8f, 0.8f);
+    houseMaterial->power = 120.0f;
+    object* house = addObject("Objects/Eigen/exports/osso.obj", "textures/colormap_flip.bmp", houseMaterial);
     house->modelSpace.translate(glm::vec3(10.0, 0.0, 0.0))->rotate(glm::radians(90.0f), glm::vec3(0.0, -1.0, 0.0));
 
     auto* carMaterial = createMaterial();
